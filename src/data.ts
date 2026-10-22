@@ -49,7 +49,7 @@ export const neofetch: { key: string; value: string; accent?: string }[] = [
   { key: 'editor', value: 'neovim, zed' },
   { key: 'education', value: profile.degreeShort },
   { key: 'background', value: 'biology, environmental science' },
-  { key: 'interests', value: 'biotech, game dev, open source' },
+  { key: 'interests', value: 'ai/ml, biotech, game dev' },
   { key: 'location', value: profile.location },
   { key: 'status', value: profile.status, accent: 'text-green' },
 ]
