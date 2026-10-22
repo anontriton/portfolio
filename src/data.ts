@@ -179,52 +179,6 @@ emscripten → wasm simd ───────────── browser demo, C
     ],
   },
   {
-    slug: 'touchline',
-    name: 'Touchline',
-    file: 'touchline',
-    tagline: 'A Fantasy Premier League decision assistant that shows its working.',
-    description:
-      "Touchline answers one question each week: what should I do with my team? It projects every player's expected points from underlying stats, minutes, and fixtures, then weighs transfers, captaincy, and chips against those numbers. Every recommendation breaks down into the parts behind it, so you can see why it's suggested and how confident it is. I use it daily as my own app on my phone; the public demo gives you a random squad to play with on a weekly copy of real data.",
-    year: '2026',
-    tags: ['web', 'ml'],
-    stack: ['Next.js 16', 'React 19', 'TypeScript', 'SQLite', 'Drizzle', 'Claude API', 'Tailwind', 'shadcn/ui', 'Recharts', 'Docker', 'Railway'],
-    featured: true,
-    // Screenshots go in public/images/touchline/ and a short muted clip in
-    // public/videos/. Uncomment and fill in once they exist:
-    // image: { src: '/images/touchline/planner.png', alt: '', caption: '' },
-    // video: '/videos/touchline.mp4',
-    // gallery: [{ src: '/images/touchline/transfers.png', alt: '', caption: '' }],
-    highlights: [
-      'A transparent projection model, written from scratch: team strength from expected goals weighted toward recent form, start and minutes probabilities from match history, and per-90 rates pulled toward position averages so small samples don’t swing wildly.',
-      'Every expected-points figure splits into components you can inspect.',
-      'Decision tools on one engine: a transfer advisor comparing one- and two-move options against saving the transfer, a multi-week planner, a Wildcard/Free Hit squad builder, chip timing, and a league view of captaincy risk and differentials against overall ownership.',
-      'Checks itself: it saves its suggestion before each deadline, then scores it against what was actually done and against real points to measure bias and calibration.',
-      'News with sources: reads news feeds, FPL analysis sites, and each club’s official site (respecting robots.txt), sorts items into verified, credible, opinion, and community tiers, and tags European and cup games. Optional Claude summaries must cite the items they draw on.',
-      'A Claude chat assistant with read-only tools over the projections and transfer evaluations; any change it suggests needs a tap to confirm.',
-      'A sandboxed public demo: each visitor gets their own SQLite database with the shared data attached read-only, so nothing a visitor does can reach outside services or my data. The demo refreshes its own data each week.',
-    ],
-    links: [{ label: 'live demo', href: 'https://touchline.iversonlai.dev', primary: true }],
-    note: 'Code available on request. A personal, non-commercial project, not affiliated with or endorsed by the Premier League or Fantasy Premier League.',
-    sections: [
-      {
-        heading: 'one engine, every decision',
-        code: `match history · xG · fixtures · news
-      │
-      ▼
-projection model ─────── expected points, split into components
-      │
-      ├── transfer advisor   1–2 moves vs. saving the transfer
-      ├── planner            multiple gameweeks ahead
-      ├── squad builder      wildcard / free hit
-      ├── chips · captaincy  timing, risk, differentials
-      └── claude assistant   read-only tools, tap to confirm
-      │
-      ▼
-pre-deadline snapshot ── scored against real points`,
-      },
-    ],
-  },
-  {
     slug: 'ml-library',
     name: 'ML Library in C',
     file: 'ml-library',
@@ -314,6 +268,52 @@ examples/mnist/   digit classifier linked against libml.a`,
             + w_safety * positional_safety(tile)
             + w_ally   * ally_proximity(tile)
   execute(best) or fall back to next-best`,
+      },
+    ],
+  },
+  {
+    slug: 'touchline',
+    name: 'Touchline',
+    file: 'touchline',
+    tagline: 'A Fantasy Premier League decision assistant that shows its working.',
+    description:
+      "Touchline answers one question each week: what should I do with my team? It projects every player's expected points from underlying stats, minutes, and fixtures, then weighs transfers, captaincy, and chips against those numbers. Every recommendation breaks down into the parts behind it, so you can see why it's suggested and how confident it is. I use it daily as my own app on my phone; the public demo gives you a random squad to play with on a weekly copy of real data.",
+    year: '2026',
+    tags: ['web', 'ml'],
+    stack: ['Next.js 16', 'React 19', 'TypeScript', 'SQLite', 'Drizzle', 'Claude API', 'Tailwind', 'shadcn/ui', 'Recharts', 'Docker', 'Railway'],
+    featured: true,
+    // Screenshots go in public/images/touchline/ and a short muted clip in
+    // public/videos/. Uncomment and fill in once they exist:
+    // image: { src: '/images/touchline/planner.png', alt: '', caption: '' },
+    // video: '/videos/touchline.mp4',
+    // gallery: [{ src: '/images/touchline/transfers.png', alt: '', caption: '' }],
+    highlights: [
+      'A transparent projection model, written from scratch: team strength from expected goals weighted toward recent form, start and minutes probabilities from match history, and per-90 rates pulled toward position averages so small samples don’t swing wildly.',
+      'Every expected-points figure splits into components you can inspect.',
+      'Decision tools on one engine: a transfer advisor comparing one- and two-move options against saving the transfer, a multi-week planner, a Wildcard/Free Hit squad builder, chip timing, and a league view of captaincy risk and differentials against overall ownership.',
+      'Checks itself: it saves its suggestion before each deadline, then scores it against what was actually done and against real points to measure bias and calibration.',
+      'News with sources: reads news feeds, FPL analysis sites, and each club’s official site (respecting robots.txt), sorts items into verified, credible, opinion, and community tiers, and tags European and cup games. Optional Claude summaries must cite the items they draw on.',
+      'A Claude chat assistant with read-only tools over the projections and transfer evaluations; any change it suggests needs a tap to confirm.',
+      'A sandboxed public demo: each visitor gets their own SQLite database with the shared data attached read-only, so nothing a visitor does can reach outside services or my data. The demo refreshes its own data each week.',
+    ],
+    links: [{ label: 'live demo', href: 'https://touchline.iversonlai.dev', primary: true }],
+    note: 'Code available on request. A personal, non-commercial project, not affiliated with or endorsed by the Premier League or Fantasy Premier League.',
+    sections: [
+      {
+        heading: 'one engine, every decision',
+        code: `match history · xG · fixtures · news
+      │
+      ▼
+projection model ─────── expected points, split into components
+      │
+      ├── transfer advisor   1–2 moves vs. saving the transfer
+      ├── planner            multiple gameweeks ahead
+      ├── squad builder      wildcard / free hit
+      ├── chips · captaincy  timing, risk, differentials
+      └── claude assistant   read-only tools, tap to confirm
+      │
+      ▼
+pre-deadline snapshot ── scored against real points`,
       },
     ],
   },

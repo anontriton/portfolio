@@ -29,7 +29,8 @@ const LOGO = String.raw`██╗██╗
 ╚═╝╚══════╝`
 
 export default function Home() {
-  const others = projects.slice(1)
+  // Unfeatured projects are only listed on /projects.
+  const others = projects.slice(1).filter((p) => p.featured)
 
   return (
     <>
