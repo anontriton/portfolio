@@ -5,3 +5,7 @@ dist
 src/generated
 # full-size original; the site uses the resized iverson-ascii.png
 public/images/iverson.png
+
+# blog drafts stay on this machine; only the template is tracked
+src/posts/drafts/*
+!src/posts/drafts/hello-world.md

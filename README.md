@@ -48,7 +48,7 @@ tags: c++, simd, performance
 Post body in Markdown…
 ```
 
-`title` and `date` (YYYY-MM-DD) are required. Write drafts in `src/posts/drafts/`: they appear in `npm run dev` (marked "draft") but are never included in a production build. To publish, move the file up into `src/posts/`, then commit and push. Images go in `public/images/blog/` and are referenced as `/images/blog/name.png`. [`src/posts/drafts/hello-world.md`](src/posts/drafts/hello-world.md) is a template showing everything the renderer supports.
+`title` and `date` (YYYY-MM-DD) are required. Write drafts in `src/posts/drafts/`: they appear in `npm run dev` (marked "draft") but are never included in a production build, and git ignores them, so they stay on this machine (back them up yourself). To publish, move the file up into `src/posts/`, then commit and push. Images go in `public/images/blog/` and are referenced as `/images/blog/name.png`. [`src/posts/drafts/hello-world.md`](src/posts/drafts/hello-world.md) is a template showing everything the renderer supports.
 
 ## Background
 
