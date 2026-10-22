@@ -39,7 +39,11 @@ export async function POST(request: Request) {
 
   const key = process.env.RESEND_API_KEY
   const to = process.env.CONTACT_TO
-  if (!key || !to) return fail(500, 'contact form is not configured')
+  if (!key || !to) {
+    // shows in Vercel → Deployment → Logs; visitors only see the generic error
+    console.error('contact form missing env:', [!key && 'RESEND_API_KEY', !to && 'CONTACT_TO'].filter(Boolean).join(', '))
+    return fail(500, 'contact form is not configured')
+  }
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
