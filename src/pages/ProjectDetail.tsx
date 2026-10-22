@@ -33,7 +33,21 @@ export default function ProjectDetail() {
 
       {p.image && (
         <figure className="mt-10">
-          <img src={p.image.src} alt={p.image.alt} className="w-full rounded-[4px] border border-line" />
+          {p.video ? (
+            <video
+              src={p.video}
+              poster={p.image.src}
+              aria-label={p.image.alt}
+              controls
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="w-full rounded-[4px] border border-line"
+            />
+          ) : (
+            <img src={p.image.src} alt={p.image.alt} className="w-full rounded-[4px] border border-line" />
+          )}
           {p.image.caption && <figcaption className="mt-2 text-[12px] text-muted">{p.image.caption}</figcaption>}
         </figure>
       )}

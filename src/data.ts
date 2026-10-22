@@ -96,7 +96,7 @@ export type Project = {
   links: Link[]
   image?: { src: string; alt: string; caption?: string }
   // Short muted loop (public/videos/*.mp4) shown on the card in place of the
-  // image; the image doubles as its poster.
+  // image and at the top of the project page; the image doubles as its poster.
   video?: string
   gallery?: { src: string; alt: string; caption?: string }[]
   sections?: Section[]
@@ -282,11 +282,36 @@ examples/mnist/   digit classifier linked against libml.a`,
     tags: ['web', 'ml'],
     stack: ['Next.js 16', 'React 19', 'TypeScript', 'SQLite', 'Drizzle', 'Claude API', 'Tailwind', 'shadcn/ui', 'Recharts', 'Docker', 'Railway'],
     featured: true,
-    // Screenshots go in public/images/touchline/ and a short muted clip in
-    // public/videos/. Uncomment and fill in once they exist:
-    // image: { src: '/images/touchline/planner.png', alt: '', caption: '' },
-    // video: '/videos/touchline.mp4',
-    // gallery: [{ src: '/images/touchline/transfers.png', alt: '', caption: '' }],
+    // Picked from the touchline repo's media/ folder, which has a recording
+    // and a screenshot of every page.
+    image: {
+      src: '/images/touchline/home.png',
+      alt: 'Touchline’s home screen: a suggested double transfer worth +10.3 expected points, the captain pick, and the squad on a pitch.',
+      caption: 'Home: this week’s suggested move, with “see why” opening the breakdown behind it.',
+    },
+    video: '/videos/touchline-transfer-advice.mp4',
+    gallery: [
+      {
+        src: '/images/touchline/transfers.png',
+        alt: 'The transfer advisor’s best move, with the points it must beat and the reasons behind it.',
+        caption: 'The best move has to beat the value of saving the transfer, plus a safety margin.',
+      },
+      {
+        src: '/images/touchline/rankings.png',
+        alt: 'Player rankings by expected points over the next five gameweeks, with start probability, ownership, and fixtures.',
+        caption: 'Rankings over the next five gameweeks, each with the best swap into your squad.',
+      },
+      {
+        src: '/images/touchline/chip-builder.png',
+        alt: 'The Wildcard squad builder showing the best 15 within budget and the changes from the current squad.',
+        caption: 'The Wildcard / Free Hit builder: the best 15 within budget.',
+      },
+      {
+        src: '/images/touchline/league.png',
+        alt: 'The league view comparing captain options and differentials against overall ownership.',
+        caption: 'Captaincy risk and differentials against every manager’s ownership.',
+      },
+    ],
     highlights: [
       'A transparent projection model, written from scratch: team strength from expected goals weighted toward recent form, start and minutes probabilities from match history, and per-90 rates pulled toward position averages so small samples don’t swing wildly.',
       'Every expected-points figure splits into components you can inspect.',
