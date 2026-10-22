@@ -85,7 +85,12 @@ function Hero() {
       {LOGO}
     </pre>
   )
-  const swatches = ['bg-rosewater', 'bg-flamingo', 'bg-pink', 'bg-purple', 'bg-red', 'bg-maroon', 'bg-orange', 'bg-amber', 'bg-green', 'bg-teal', 'bg-cyan', 'bg-sapphire', 'bg-blue', 'bg-lavender']
+  // ANSI 0–7 over 8–15 (black red green yellow blue magenta cyan white), as
+  // Catppuccin Mocha's terminal ports define them
+  const swatches = [
+    ['#45475a', '#f38ba8', '#a6e3a1', '#f9e2af', '#89b4fa', '#f5c2e7', '#94e2d5', '#bac2de'],
+    ['#585b70', '#f37799', '#89d88b', '#ebd391', '#74a8fc', '#f2aede', '#6bd7ca', '#a6adc8'],
+  ]
 
   return (
     <section className="relative pt-10 sm:pt-16">
@@ -128,9 +133,13 @@ function Hero() {
               </div>
             ))}
           </dl>
-          <div className="mt-3 flex flex-wrap" aria-hidden>
-            {swatches.map((c) => (
-              <span key={c} className={`h-3.5 w-5 ${c}`} />
+          <div className="mt-3" aria-hidden>
+            {swatches.map((row) => (
+              <div key={row[0]} className="flex">
+                {row.map((c) => (
+                  <span key={c} className="h-3.5 w-5" style={{ background: c }} />
+                ))}
+              </div>
             ))}
           </div>
         </div>
