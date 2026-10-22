@@ -5,7 +5,6 @@ import { useTldr } from '../components/Layout'
 import ProjectCard from '../components/ProjectCard'
 import ActivityGraph from '../components/ActivityGraph'
 import AsciiPortrait from '../components/AsciiPortrait'
-import Ocean from '../components/Ocean'
 import {
   ActionButton,
   Button,
@@ -56,7 +55,6 @@ export default function Home() {
       <Experience />
       {contributions.length > 0 && <Contributions />}
       <Skills />
-      <Reef />
       <About />
       <Education />
       <Writing />
@@ -342,20 +340,6 @@ function Skills() {
           </div>
         ))}
       </div>
-    </Section>
-  )
-}
-
-function Reef() {
-  return (
-    <Section>
-      <Prompt cmd="./reef" arg="--boids" right={<span className="hidden text-[11px] text-muted sm:inline">hover to scatter · click to splash</span>} />
-      <div className="overflow-hidden rounded-[4px] border border-line bg-surface">
-        <Ocean />
-      </div>
-      <p className="mt-2 text-[11.5px] text-muted">
-        a nod to my time at scripps tracking humpbacks · flocking from separation, alignment, and cohesion
-      </p>
     </Section>
   )
 }

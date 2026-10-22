@@ -32,9 +32,10 @@ html {
   scroll-behavior: smooth;
 }
 
+/* body stays transparent so the fixed shark canvas (z-index -10) shows
+   through; html carries the page colour */
 body {
   font-family: var(--font-mono);
-  background: var(--color-bg);
   color: var(--color-fg-dim);
   -webkit-font-smoothing: antialiased;
 }
@@ -78,6 +79,21 @@ body {
     transparent 0,
     transparent 2px,
     rgb(255 255 255 / 0.012) 3px
+  );
+}
+
+/* sharks swim at full strength in the side gutters and fade to a third
+   behind the 860px content column */
+.shark-sea {
+  --fade: rgb(0 0 0 / 0.35);
+  mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 calc(50% - 520px),
+    var(--fade) calc(50% - 400px),
+    var(--fade) calc(50% + 400px),
+    #000 calc(50% + 520px),
+    #000 100%
   );
 }
 

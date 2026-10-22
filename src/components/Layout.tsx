@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { profile, projects } from '../data'
 import { IconFile, IconGithub, IconLinkedin, IconMail } from './ui'
+import SharkBackground from './SharkBackground'
 
 const TldrContext = createContext<() => void>(() => {})
 export const useTldr = () => useContext(TldrContext)
@@ -16,6 +17,7 @@ export default function Layout() {
 
   return (
     <TldrContext.Provider value={() => setTldrOpen(true)}>
+      <SharkBackground />
       <div className="scanlines" aria-hidden />
       <Nav />
       <main className="mx-auto w-full max-w-[860px] px-4 pb-16 sm:px-6">
@@ -77,6 +79,9 @@ function Footer() {
         {time} PT · {profile.location.toLowerCase()}
       </span>
       <span className="flex items-center gap-4">
+        <a href="https://github.com/stackedlol/ascii-sharks" target="_blank" rel="noreferrer" className="hover:text-fg">
+          sharks by @stackedlol
+        </a>
         <a href={profile.sourceRepo} target="_blank" rel="noreferrer" className="hover:text-fg">
           view source
         </a>
