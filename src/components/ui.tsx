@@ -106,11 +106,6 @@ export function ActionButton({ onClick, children, icon }: { onClick: () => void;
   )
 }
 
-export function formatMonth(date: string) {
-  const d = new Date(date + 'T00:00:00')
-  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toLowerCase()
-}
-
 /* icons — 16px, stroke-based */
 const svg = {
   width: 15,

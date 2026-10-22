@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import './index.css'
 import Layout from './components/Layout'
@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import Projects from './pages/Projects'
 import ProjectDetail from './pages/ProjectDetail'
 import Blog from './pages/Blog'
+import BlogPost from './pages/BlogPost'
 import NotFound from './pages/NotFound'
 
 createRoot(document.getElementById('root')!).render(
@@ -19,7 +20,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="projects" element={<Projects />} />
           <Route path="projects/:slug" element={<ProjectDetail />} />
           <Route path="blog" element={<Blog />} />
-          <Route path="writing" element={<Navigate to="/blog" replace />} />
+          <Route path="blog/:slug" element={<BlogPost />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

@@ -15,7 +15,7 @@ npm run preview   # serve dist/ locally
 
 ## Editing content
 
-Everything on the site comes from [`src/data.ts`](src/data.ts):
+Everything on the site except blog posts comes from [`src/data.ts`](src/data.ts):
 
 - `profile` — name, links, email, bio (`pitch`), status line,  "currently building" entry
 - `neofetch` — the hero readout, top to bottom; lines that repeat profile facts read them from `profile`, and `uptime` counts up from June 2023 on its own
@@ -32,6 +32,23 @@ Everything on the site comes from [`src/data.ts`](src/data.ts):
 
 - **Project videos** — put a short muted clip in `public/videos/` and set the project's `video`. Its `image` becomes the poster frame.
 - **Activity graph** — `scripts/fetch-contributions.mjs` pulls the last year of GitHub contributions before every `dev` and `build`. If it can't reach GitHub, the graph is hidden.
+
+## Blog
+
+Posts are Markdown files in [`src/posts/`](src/posts/), loaded by [`src/blog.ts`](src/blog.ts). The file name is the URL: `src/posts/simd-gemm.md` → `/blog/simd-gemm`. Each file starts with front matter:
+
+```md
+---
+title: Making GEMM fast with AVX2
+date: 2026-11-02
+summary: One line for the blog list.
+tags: c++, simd, performance
+---
+
+Post body in Markdown…
+```
+
+`title` and `date` (YYYY-MM-DD) are required. Write drafts in `src/posts/drafts/`: they appear in `npm run dev` (marked "draft") but are never included in a production build. To publish, move the file up into `src/posts/`, then commit and push. Images go in `public/images/blog/` and are referenced as `/images/blog/name.png`. [`src/posts/drafts/hello-world.md`](src/posts/drafts/hello-world.md) is a template showing everything the renderer supports.
 
 ## Background
 

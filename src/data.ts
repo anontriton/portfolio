@@ -1,5 +1,6 @@
-// All site content lives here. Add a project, job, or article by adding an
-// entry to the matching array; pages render from this file.
+// All site content lives here. Add a project or job by adding an entry to the
+// matching array; pages render from this file. Blog posts are Markdown files
+// in src/posts/ (see src/blog.ts).
 
 export const profile = {
   name: 'Iverson Lai',
@@ -425,29 +426,6 @@ export const education = [
     degree: 'B.S. Environmental Science',
     dates: 'Jun 2022',
     note: 'Scientific research, quantitative analysis, computational approaches to real-world problems.',
-  },
-]
-
-export type Article = {
-  title: string
-  date: string // YYYY-MM-DD
-  summary: string
-  href: string
-  tags: string[]
-  readTime?: string
-}
-
-// Not shown on the site yet; /blog is an empty placeholder for now.
-// Only published articles. Planned: SIMD GEMM optimization, autodiff in C,
-// utility AI in Godot, first open-source C++ contribution.
-export const writing: Article[] = [
-  {
-    title: 'Showing Its Work: A GPT-2 Engine Proven Correct at Every Step',
-    date: '2026-09-01',
-    summary:
-      'Building GPT-2 three times — PyTorch, C++, WebAssembly — and how each version was proven to compute the same thing as the one before it.',
-    href: 'https://github.com/anontriton/llm-ref-eng/blob/main/docs/writeup.md',
-    tags: ['c++', 'ml', 'validation'],
   },
 ]
 
