@@ -135,7 +135,7 @@ function Hero() {
         </div>
       </div>
 
-      <p className="mt-9 max-w-[640px] text-[14.5px] leading-relaxed text-fg-dim">
+      <p className="mt-9 text-[14.5px] leading-relaxed text-fg-dim">
         {profile.pitch}
         <span className="cursor" />
       </p>
@@ -146,24 +146,29 @@ function Hero() {
         </p>
       )}
 
-      <div className="mt-7 flex flex-wrap items-center gap-2">
-        <Button href={profile.resume} primary icon={<IconFile />}>
-          resume
-        </Button>
-        <Button href={`mailto:${profile.email}`} icon={<IconMail />}>
-          email
-        </Button>
-        <ActionButton onClick={openTldr}>tl;dr</ActionButton>
+      {/* buttons and icons share a row on desktop; icons drop below on mobile */}
+      <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button href={profile.resume} primary icon={<IconFile />}>
+            resume
+          </Button>
+          <Button href={`mailto:${profile.email}`} icon={<IconMail />}>
+            email
+          </Button>
+          <ActionButton onClick={openTldr}>tl;dr</ActionButton>
+        </div>
         <span className="mx-1.5 hidden h-6 w-px bg-line sm:block" />
-        <a href={profile.github} target="_blank" rel="noreferrer" aria-label="GitHub" title="github" className="p-1.5 text-muted transition-colors hover:text-fg">
-          <IconGithub size={21} />
-        </a>
-        <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" title="linkedin" className="p-1.5 text-muted transition-colors hover:text-blue">
-          <IconLinkedin size={21} />
-        </a>
-        <a href={profile.monkeytype} target="_blank" rel="noreferrer" aria-label="Monkeytype" title="monkeytype" className="p-1.5 text-muted transition-colors hover:text-amber">
-          <IconKeyboard size={22} />
-        </a>
+        <div className="-ml-1.5 flex items-center gap-2 sm:ml-0">
+          <a href={profile.github} target="_blank" rel="noreferrer" aria-label="GitHub" title="github" className="p-1.5 text-muted transition-colors hover:text-fg">
+            <IconGithub size={21} />
+          </a>
+          <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" title="linkedin" className="p-1.5 text-muted transition-colors hover:text-blue">
+            <IconLinkedin size={21} />
+          </a>
+          <a href={profile.monkeytype} target="_blank" rel="noreferrer" aria-label="Monkeytype" title="monkeytype" className="p-1.5 text-muted transition-colors hover:text-amber">
+            <IconKeyboard size={22} />
+          </a>
+        </div>
       </div>
     </section>
   )

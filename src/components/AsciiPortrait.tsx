@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 // become heavy glyphs and dark areas (hair, eyes) light ones, so it reads like
 // the picture on a dark page; a bright outline traces the silhouette so dark
 // hair still has a shape. The backdrop is left blank.
-//   1. tone — brightness, contrast-stretched so flat cartoon shading reads
-//      as clean steps rather than mush
+//   1. tone — brightness ranked within the subject, so flat cartoon colours
+//      spread over the ramp; thin ink lines are kept as gaps
 //   2. outline — a Sobel edge on the alpha mask, drawn on top like a pen
 //   3. glyphs — tone picks from a ~60-step ramp; rows sit closer than the
 //      font is tall, so strokes overlap into a dense, drawn texture
@@ -16,8 +16,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 const RAMP = ':;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 const COLS = 92
 const CELL = 0.79 // cell width / height; tighter than the font so rows overlap
-const LIGHT = 0.85 // brightness at or above this gets the heaviest glyph
-const DARK = 0.18 // brightness at or below this gets the lightest
+const INK_LINES = 0.6 // how much a cell's darkest subpixel (line work) pulls it dark
+const GAMMA = 1.4 // >1 keeps mid-tones (skin) lighter than highlights
 const RADIUS = 46 // px of cursor influence
 const PUSH = 2600
 const SPRING = 90
@@ -85,38 +85,63 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
         const gy = at(f, x - 1, y + 1) + 2 * at(f, x, y + 1) + at(f, x + 1, y + 1) - at(f, x - 1, y - 1) - 2 * at(f, x, y - 1) - at(f, x + 1, y - 1)
         return Math.hypot(gx, gy)
       }
-      const smooth = (t: number) => t * t * (3 - 2 * t)
-
-      glyphs = []
+      // Per cell: coverage, brightness, and the silhouette outline. Brightness
+      // leans on the cell's darkest subpixel so thin ink lines (eyes, brows,
+      // the mouth) survive as gaps instead of averaging away.
+      type Cell = { cover: number; light: number; line: number }
+      const cells: Cell[] = []
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < COLS; c++) {
           let cover = 0
-          let tone = 0
+          let sum = 0
+          let darkest = 1
           let line = 0
           for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
             const x = c * 2 + dx
             const y = r * 2 + dy
             const a = at(alpha, x, y)
             cover += a / 4
-            tone += (smooth(Math.min(1, Math.max(0, (at(lum, x, y) - DARK) / (LIGHT - DARK)))) * a) / 4
+            sum += at(lum, x, y) * a
+            if (a > 0.5) darkest = Math.min(darkest, at(lum, x, y))
             // the silhouette, as an outline pen stroke
-            const outline = Math.min(1, sobel(alpha, x, y) / 1.6)
-            line = Math.max(line, outline)
+            line = Math.max(line, Math.min(1, sobel(alpha, x, y) / 1.6))
           }
-          if (cover < 0.3 && line < 0.5) continue
-          const amount = Math.max(tone, line * 0.92)
-          glyphs.push({
-            ch: RAMP[Math.round(amount * (RAMP.length - 1))],
-            alpha: 0.45 + 0.55 * amount,
-            hx: (c + 0.5) * cw,
-            hy: (r + 0.5) * chh,
-            ox: 0,
-            oy: 0,
-            vx: 0,
-            vy: 0,
-          })
+          const mean = cover > 0 ? sum / (cover * 4) : 0
+          cells.push({ cover, light: (1 - INK_LINES) * mean + INK_LINES * Math.min(mean, darkest), line })
         }
       }
+
+      // Rank brightness within the subject so flat cartoon colours spread over
+      // the ramp: skin lands mid-ramp and highlights (teeth, collar) above it.
+      const sorted = cells.filter((k) => k.cover >= 0.3).map((k) => k.light).sort((x, y) => x - y)
+      const rank = (l: number) => {
+        let lo = 0
+        let hi = sorted.length
+        while (lo < hi) {
+          const mid = (lo + hi) >> 1
+          if (sorted[mid] < l) lo = mid + 1
+          else hi = mid
+        }
+        return lo / (sorted.length || 1)
+      }
+
+      glyphs = []
+      cells.forEach(({ cover, light, line }, i) => {
+        if (cover < 0.3 && line < 0.5) return
+        const c = i % COLS
+        const r = Math.floor(i / COLS)
+        const amount = Math.max(Math.pow(rank(light), GAMMA), line * 0.92)
+        glyphs.push({
+          ch: RAMP[Math.round(amount * (RAMP.length - 1))],
+          alpha: 0.45 + 0.55 * amount,
+          hx: (c + 0.5) * cw,
+          hy: (r + 0.5) * chh,
+          ox: 0,
+          oy: 0,
+          vx: 0,
+          vy: 0,
+        })
+      })
       draw()
     }
 
