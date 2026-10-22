@@ -237,18 +237,49 @@ examples/mnist/   digit classifier linked against libml.a`,
     tags: ['games'],
     stack: ['Godot 4.4', 'GDScript', 'JSON', 'state machines', 'pathfinding', 'utility AI'],
     featured: true,
+    stats: [
+      { value: '~16k', label: 'lines of GDScript', detail: 'with an in-engine test suite' },
+      { value: '7', label: 'playable characters', detail: 'each with a distinct role' },
+      { value: '20', label: 'abilities', detail: 'plus 12 weapons' },
+      { value: 'v0.0.34', label: 'latest build', detail: 'Windows and macOS' },
+    ],
     image: {
-      src: '/images/regenesis-battle.png',
-      alt: 'A battle in Re: Genesis — a selected unit shows blue movement tiles and red attack-range tiles.',
+      src: '/images/regenesis/movement-and-attack-range.jpg',
+      alt: 'A battle in Re: Genesis — Thomas is selected, with blue tiles showing where he can move and red tiles showing everything he could attack after moving.',
       caption: 'Selecting a unit shows its whole reach: blue for movement, red for every tile it could strike after moving.',
     },
+    // A 4.6-minute playthrough of the opening, sped up 5× and re-encoded at
+    // 720p to keep it small.
+    video: '/videos/regenesis-demo.mp4',
+    gallery: [
+      {
+        src: '/images/regenesis/combat-preview.jpg',
+        alt: 'The combat forecast: each side’s HP before and after, damage, hit and crit chance.',
+        caption: 'Every attack is forecast before you commit: HP after the exchange, hit, crit, and whether the target can counter.',
+      },
+      {
+        src: '/images/regenesis/critical-hit.jpg',
+        alt: 'A critical hit in the combat window.',
+        caption: 'Crits are scaled by luck — and the enemy gets them too.',
+      },
+      {
+        src: '/images/regenesis/story-dialogue.jpg',
+        alt: 'Visual-novel story scene: Lisa speaks while Commander Gallagher listens.',
+        caption: 'Story between battles, visual-novel style, with the speaker highlighted.',
+      },
+      {
+        src: '/images/regenesis/your-move-banner.jpg',
+        alt: 'The Your Move banner sweeping across the battlefield at the start of the player phase.',
+        caption: 'Player and enemy phases alternate, Fire Emblem style.',
+      },
+    ],
     highlights: [
-      'Utility-based enemy AI that ranks move, attack, heal, and buff actions by damage potential, target health, aggression, positional safety, and ally proximity — with fallbacks when the preferred action fails.',
-      'Terrain-weighted grid search with movement-cost relaxation, obstacles, and faction-aware occupancy, combined with weapon ranges into tactical overlays.',
-      'Combat with movement, attacks, counterattacks, damage calculation, and status effects.',
-      'Campaign and battle state machines coordinated with an async UI queue that sequences dialogue, camera, and notifications while blocking input.',
-      'Data-driven content in JSON; a complete playable chapter with dialogue, progression, and scripted events.',
-      'Distributed builds for Windows and macOS.',
+      'Utility-based enemy AI that scores every action by expected damage, target health, accumulated aggro, positional safety, and ally proximity, with a little noise so a map never replays the same way. It presses when it outnumbers you locally and backs off when isolated; healers triage allies in critical condition.',
+      'Cost-aware flood fill over the grid with per-unit terrain costs, obstacles, and faction-aware occupancy, folded together with weapon ranges into one overlay of everything a unit can hit after moving.',
+      'Combat math with a physical/special split, damage variance, luck-scaled crits, speed-scaled accuracy, counterattacks, weapon and element triangles, and a forecast that matches what the attack actually does.',
+      'A two-layer architecture separating campaign orchestration from battle logic over signals, with an async UI queue that sequences dialogue, camera, and notifications while blocking input.',
+      'All content defined in JSON: 7 protagonists, 20 abilities, 12 weapons, and a scripting system that fires popups, reinforcements, camera moves, and objective changes mid-battle.',
+      'A polish pass (v0.0.34) added tile-by-tile movement, map HP bars, hit and spell effects, phase banners, and typewriter dialogue. Builds ship for Windows and macOS.',
     ],
     links: [
       { label: 'download build', href: 'https://github.com/anontriton/regenesis-builds/releases', primary: true },
@@ -259,15 +290,23 @@ examples/mnist/   digit classifier linked against libml.a`,
       {
         heading: 'enemy turn',
         code: `for each enemy unit:
-  candidates = reachable_tiles(unit)        # terrain-weighted search
+  candidates = reachable_tiles(unit)        # terrain-weighted flood fill
   for tile in candidates:
     for action in [attack, heal, buff, wait]:
-      score = w_dmg    * damage_potential
-            + w_kill   * (1 - target_hp_ratio)
-            + w_aggr   * aggression
-            + w_safety * positional_safety(tile)
-            + w_ally   * ally_proximity(tile)
+      score = 0.40 * damage_potential       # expected + crit + lethal bonus
+            + 0.25 * (1 - target_hp_ratio)
+            + 0.35 * aggro(target)
+            + 0.30 * safety(tile)           # counter range, local numbers
+            + 0.15 * ally_proximity(tile)
+            + 0.05 * proximity(tile)
+            ± 0.05 noise
   execute(best) or fall back to next-best`,
+      },
+      {
+        heading: 'what’s next',
+        body: [
+          'The build is one complete chapter. Still to come: saving, more chapters (the content pipeline handles them; authored maps and story are the bottleneck), full attack animations, escort and seize objectives, and sound.',
+        ],
       },
     ],
   },
@@ -282,14 +321,15 @@ examples/mnist/   digit classifier linked against libml.a`,
     tags: ['web', 'ml'],
     stack: ['Next.js 16', 'React 19', 'TypeScript', 'SQLite', 'Drizzle', 'Claude API', 'Tailwind', 'shadcn/ui', 'Recharts', 'Docker', 'Railway'],
     featured: true,
-    // Picked from the touchline repo's media/ folder, which has a recording
-    // and a screenshot of every page.
+    // Screenshots are from the touchline repo's media/ folder. The video is a
+    // scripted tour of the live demo (home → breakdown → transfers → rankings
+    // and compare → fixtures → chips and builder → league), played at 1.5×.
     image: {
       src: '/images/touchline/home.png',
       alt: 'Touchline’s home screen: a suggested double transfer worth +10.3 expected points, the captain pick, and the squad on a pitch.',
       caption: 'Home: this week’s suggested move, with “see why” opening the breakdown behind it.',
     },
-    video: '/videos/touchline-transfer-advice.mp4',
+    video: '/videos/touchline-tour.mp4',
     gallery: [
       {
         src: '/images/touchline/transfers.png',
