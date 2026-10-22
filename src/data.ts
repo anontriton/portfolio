@@ -5,15 +5,15 @@ export const profile = {
   name: 'Iverson Lai',
   handle: 'iversonlai',
   host: 'archlinux', // i use arch, btw
-  title: 'Software Engineer',
-  focus: 'C/C++ · Systems · Machine Learning',
+  title: 'software engineer',
+  focus: 'c/c++, systems, machine learning',
   pitch:
-    'I build software to understand how it works — from high-performance machine learning inference engines and low-level systems to game AI and full-stack applications.',
-  location: 'San Diego, CA',
+    'I\'m a software engineer who loves building things, occasionally reinventing the wheel just to learn something new. Outside of development, you\'ll probably find me playing RPGs (currently Skyrim, again).',
+  location: 'san diego, ca',
   timezone: 'America/Los_Angeles',
-  degree: 'M.S. Computer Science, Tufts University (2026)',
-  degreeShort: 'M.S. Computer Science, Tufts (2026)', // fits beside the portrait
-  status: 'open to entry-level SWE roles',
+  degree: 'm.s. computer science, tufts university, 2026',
+  degreeShort: 'm.s. computer science, tufts', // fits beside the portrait
+  status: 'open to swe roles',
   email: 'iversonlai@icloud.com',
   github: 'https://github.com/anontriton',
   linkedin: 'https://www.linkedin.com/in/iversonlai',
@@ -46,20 +46,19 @@ export const neofetch: { key: string; value: string; accent?: string }[] = [
   { key: 'focus', value: profile.focus.toLowerCase() },
   { key: 'kernel', value: 'coffee', accent: 'text-orange' },
   { key: 'uptime', value: uptime('2023-06') }, // started CS in June 2023
-  { key: 'languages', value: 'C, C++, Python' },
   { key: 'editor', value: 'neovim, zed' },
   { key: 'education', value: profile.degreeShort },
-  { key: 'background', value: 'biotechnology, research, leadership' },
+  { key: 'background', value: 'biology, environmental science' },
   { key: 'interests', value: 'biotech, game dev, open source' },
   { key: 'location', value: profile.location },
   { key: 'status', value: profile.status, accent: 'text-green' },
 ]
 
 export const about = [
-  "I'm a software engineer with a master's in Computer Science from Tufts and a background in environmental science and scientific research.",
-  "My interests are systems programming, performance engineering, machine learning infrastructure, and game development. I like understanding what's happening beneath high-level abstractions — implementing neural networks from scratch, optimizing matrix multiplication in C++, or designing how a game character decides what to do next.",
-  'I learn best by building things. My favorite projects recreate complex systems from first principles, then push on their design, performance, and correctness.',
-  'Before software, I studied environmental science at UC San Diego and worked on research involving underwater acoustic sensors and biomedical testing. That shaped my interest in software for meaningful scientific and technical problems, particularly in biotechnology and healthcare.',
+  "Howdy. I'm a software engineer with a background in life sciences, a love for storytelling, and an inconvenient habit of wanting to understand how everything works.",
+  "My journey into software wasn't exactly conventional. I studied environmental science at UC San Diego before earning my master's in computer science at Tufts University. Along the way, I worked in scientific research, from using underwater acoustic sensors to track marine life (hence the sharks!) to evaluating biomedical blood-testing devices. Those experiences gave me an appreciation for how technology can help us better understand the world and solve meaningful problems.",
+  "These days, I'm especially curious about artificial intelligence, machine learning, and the systems that make them work. I enjoy getting under the hood of complex systems, whether that's building a neural network library from scratch or figuring out how to make something faster and more efficient. Sometimes, a simple \"Wait, how does that actually work?\" turns into a project that takes a little longer than expected, but that's half the fun. I like to think my interdisciplinary background and curiosity bring a fresh perspective to the problems I tackle.",
+  "Outside of programming, you'll usually find me gaming, writing, painting, or getting lost in a good book. I've always been drawn to the intersection of art and technology, and game development has been one way for me to bring those interests together. I even dedicated my master's capstone project to building a retro-inspired tactical RPG, complete with an original story and characters. That creative side also shapes how I approach engineering: exchanging ideas, exploring possibilities, bringing a vision to life, repeat. At the end of the day, I just really enjoy making things.",
 ]
 
 export const skills: { group: string; items: string[] }[] = [
