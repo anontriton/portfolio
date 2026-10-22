@@ -286,7 +286,6 @@ examples/mnist/   digit classifier linked against libml.a`,
       { label: 'download build', href: 'https://github.com/anontriton/regenesis-builds/releases' },
       { label: 'builds repo', href: 'https://github.com/anontriton/regenesis-builds' },
     ],
-    note: 'Source is private — happy to walk through the code in an interview.',
     sections: [
       // Code samples match the "Source code" section of the regenesis-builds README.
       {
