@@ -14,7 +14,7 @@ export const profile = {
   degree: 'm.s. computer science, tufts university, 2026',
   degreeShort: 'm.s. computer science, tufts 2026', // fits beside the portrait
   status: 'open to swe roles',
-  email: 'iversonlai@icloud.com',
+  email: 'hello@iversonlai.dev',
   github: 'https://github.com/anontriton',
   linkedin: 'https://www.linkedin.com/in/iversonlai',
   monkeytype: 'https://monkeytype.com/profile/iversonlai0',
