@@ -9,7 +9,7 @@ export const profile = {
   title: 'software engineer',
   focus: 'c/c++, systems, machine learning',
   pitch:
-    'I\'m a software engineer who loves building things, occasionally reinventing the wheel just to learn something new. Outside of development, you\'ll probably find me playing RPGs (currently Skyrim, again).',
+    "Hey! I'm a software engineer who likes learning by doing. Many of my projects start with something I want to understand, and lately that's meant a lot of experimenting with machine learning and systems programming. Most recently, I built a neural network library from scratch in C.",
   location: 'san diego, ca',
   timezone: 'America/Los_Angeles',
   degree: 'm.s. computer science, tufts university, 2026',
