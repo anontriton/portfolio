@@ -96,7 +96,7 @@ function Hero() {
 
       <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10">
         {profile.portrait ? (
-          <div className="w-[170px] shrink-0 sm:w-[190px]">
+          <div className="w-[200px] shrink-0 sm:w-[230px]">
             <AsciiPortrait src={profile.portrait} alt={`ASCII portrait of ${profile.name}`} fallback={logo} />
           </div>
         ) : (

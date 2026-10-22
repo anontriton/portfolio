@@ -47,24 +47,31 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
       ctx.font = `500 ${chh * 0.92}px 'JetBrains Mono', ui-monospace, monospace`
       ctx.textBaseline = 'top'
 
-      // Downsample to one pixel per cell, then stretch contrast.
+      // Downsample to one pixel per cell, then equalise tones so the face uses
+      // the whole glyph ramp instead of bunching in the middle.
       const sample = document.createElement('canvas')
       sample.width = COLS
       sample.height = rows
       const sctx = sample.getContext('2d', { willReadFrequently: true })!
       sctx.drawImage(img, 0, 0, COLS, rows)
       const px = sctx.getImageData(0, 0, COLS, rows).data
+      const backdrop = keyBackdrop(px, COLS, rows)
       const lum: number[] = []
-      let lo = 1
-      let hi = 0
       for (let i = 0; i < COLS * rows; i++) {
-        const a = px[i * 4 + 3] / 255
+        const a = backdrop[i] ? 0 : px[i * 4 + 3] / 255
         const l = ((0.2126 * px[i * 4] + 0.7152 * px[i * 4 + 1] + 0.0722 * px[i * 4 + 2]) / 255) * a
         lum.push(a < 0.1 ? -1 : l)
-        if (a >= 0.1) {
-          lo = Math.min(lo, l)
-          hi = Math.max(hi, l)
+      }
+      const sorted = lum.filter((l) => l >= 0).sort((x, y) => x - y)
+      const rank = (l: number) => {
+        let lo = 0
+        let hi = sorted.length
+        while (lo < hi) {
+          const mid = (lo + hi) >> 1
+          if (sorted[mid] < l) lo = mid + 1
+          else hi = mid
         }
+        return lo / (sorted.length || 1)
       }
 
       glyphs = []
@@ -72,7 +79,7 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
         for (let c = 0; c < COLS; c++) {
           const l = lum[r * COLS + c]
           if (l < 0) continue
-          const n = Math.pow((l - lo) / (hi - lo || 1), 0.85)
+          const n = Math.pow(rank(l), 1.15)
           const ch = RAMP[Math.min(RAMP.length - 1, Math.floor(n * RAMP.length))]
           if (ch === ' ') continue
           glyphs.push({ ch, hx: c * cw, hy: r * chh, ox: 0, oy: 0, vx: 0, vy: 0, lum: n })
@@ -172,4 +179,33 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
 
   if (failed) return <>{fallback}</>
   return <canvas ref={canvasRef} role="img" aria-label={alt} className="block w-full touch-pan-y" />
+}
+
+// Marks the plain backdrop of an opaque photo so it renders blank instead of
+// as a solid block: flood-fills inward from the edges through cells close to
+// the colour of the top corners. Photos that already have transparency are
+// left alone.
+function keyBackdrop(px: Uint8ClampedArray, cols: number, rows: number) {
+  const out = new Uint8Array(cols * rows)
+  for (let i = 3; i < px.length; i += 4) if (px[i] < 250) return out
+
+  const corner = (i: number) => [px[i * 4], px[i * 4 + 1], px[i * 4 + 2]]
+  const [a, b] = [corner(0), corner(cols - 1)]
+  const bg = a.map((v, k) => (v + b[k]) / 2)
+  const near = (i: number) => Math.hypot(px[i * 4] - bg[0], px[i * 4 + 1] - bg[1], px[i * 4 + 2] - bg[2]) < 48
+
+  const stack: number[] = []
+  for (let c = 0; c < cols; c++) stack.push(c, (rows - 1) * cols + c)
+  for (let r = 0; r < rows; r++) stack.push(r * cols, r * cols + cols - 1)
+  while (stack.length) {
+    const i = stack.pop()!
+    if (out[i] || !near(i)) continue
+    out[i] = 1
+    const c = i % cols
+    if (c > 0) stack.push(i - 1)
+    if (c < cols - 1) stack.push(i + 1)
+    if (i >= cols) stack.push(i - cols)
+    if (i < (rows - 1) * cols) stack.push(i + cols)
+  }
+  return out
 }

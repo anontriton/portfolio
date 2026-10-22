@@ -19,7 +19,7 @@ export const profile = {
   // Photo for the ASCII portrait in the hero. Drop it in public/images/ and
   // set the path; a cut-out PNG (transparent background) reads best.
   // null shows the IL logo instead.
-  portrait: null as null | string,
+  portrait: '/images/portrait-ascii.jpg' as null | string,
   // Shown under "building" in the hero and tl;dr. Set to null to hide.
   current: null as null | { name: string; note: string; href?: string },
   learning: 'contributing to large open-source C++ codebases',
