@@ -3,5 +3,5 @@ dist
 .vercel
 .DS_Store
 src/generated
-# full-size originals; the site uses the resized portrait-ascii.jpg
-public/images/portrait.jpg
+# full-size original; the site uses the resized iverson-ascii.png
+public/images/iverson.png
