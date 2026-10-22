@@ -12,7 +12,7 @@ export const profile = {
   location: 'san diego, ca',
   timezone: 'America/Los_Angeles',
   degree: 'm.s. computer science, tufts university, 2026',
-  degreeShort: 'm.s. computer science, tufts', // fits beside the portrait
+  degreeShort: 'm.s. computer science, tufts 2026', // fits beside the portrait
   status: 'open to swe roles',
   email: 'iversonlai@icloud.com',
   github: 'https://github.com/anontriton',
@@ -49,7 +49,7 @@ export const neofetch: { key: string; value: string; accent?: string }[] = [
   { key: 'editor', value: 'neovim, zed' },
   { key: 'education', value: profile.degreeShort },
   { key: 'background', value: 'biology, environmental science' },
-  { key: 'interests', value: 'ai/ml, biotech, game dev' },
+  { key: 'interests', value: 'ai/ml, biotech, game dev, open source' },
   { key: 'location', value: profile.location },
   { key: 'status', value: profile.status, accent: 'text-green' },
 ]
