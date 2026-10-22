@@ -12,6 +12,7 @@ export const profile = {
   location: 'San Diego, CA',
   timezone: 'America/Los_Angeles',
   degree: 'M.S. Computer Science, Tufts University (2026)',
+  degreeShort: 'M.S. Computer Science, Tufts (2026)', // fits beside the portrait
   status: 'open to entry-level SWE roles',
   email: 'iversonlai@icloud.com',
   github: 'https://github.com/anontriton',
@@ -24,7 +25,6 @@ export const profile = {
   portrait: '/images/iverson-ascii.png' as null | string,
   // Shown under "building" in the hero and tl;dr. Set to null to hide.
   current: null as null | { name: string; note: string; href?: string },
-  learning: 'contributing to large open-source C++ codebases',
   sourceRepo: 'https://github.com/anontriton/portfolio',
 }
 
@@ -39,18 +39,20 @@ function uptime(start: string) {
 }
 
 // The hero's neofetch readout, top to bottom. `accent` colours the value.
+// Lines that repeat profile facts read them from `profile`, so each value is
+// edited in one place.
 export const neofetch: { key: string; value: string; accent?: string }[] = [
-  { key: 'role', value: 'software engineer' },
-  { key: 'focus', value: 'c/c++ · systems · machine learning' },
+  { key: 'role', value: profile.title.toLowerCase() },
+  { key: 'focus', value: profile.focus.toLowerCase() },
   { key: 'kernel', value: 'coffee', accent: 'text-orange' },
   { key: 'uptime', value: uptime('2023-06') }, // started CS in June 2023
   { key: 'languages', value: 'C, C++, Python' },
   { key: 'editor', value: 'neovim, zed' },
-  { key: 'education', value: 'M.S. Computer Science, Tufts (2026)' },
+  { key: 'education', value: profile.degreeShort },
   { key: 'background', value: 'biotechnology, research, leadership' },
   { key: 'interests', value: 'biotech, game dev, open source' },
-  { key: 'location', value: 'San Diego, CA' },
-  { key: 'status', value: 'open to entry-level SWE roles', accent: 'text-green' },
+  { key: 'location', value: profile.location },
+  { key: 'status', value: profile.status, accent: 'text-green' },
 ]
 
 export const about = [
