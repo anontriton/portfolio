@@ -4,20 +4,22 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 // become heavy glyphs and dark areas (hair, eyes) light ones, so it reads like
 // the picture on a dark page; a bright outline traces the silhouette so dark
 // hair still has a shape. The backdrop is left blank.
-//   1. tone — brightness ranked within the subject, so flat cartoon colours
-//      spread over the ramp; thin ink lines are kept as gaps
+//   1. tone — brightness stretched across the subject and snapped to a short
+//      ramp, so flat colours read as even textures; thin ink lines stay gaps
 //   2. outline — a Sobel edge on the alpha mask, drawn on top like a pen
-//   3. glyphs — tone picks from a ~60-step ramp; rows sit closer than the
-//      font is tall, so strokes overlap into a dense, drawn texture
+//   3. glyphs — rows sit closer than the font is tall, so strokes overlap
+//      into a dense, drawn texture
 // Each glyph sits on a spring; the cursor pushes glyphs away and they settle.
 
-// Ordered from lightest to heaviest. Starts at ':' so even the darkest parts
-// of the subject keep a faint texture inside the silhouette.
-const RAMP = ':;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
+// Ordered from lightest to heaviest. Short on purpose: a flat cartoon colour
+// lands on one glyph and reads as an even texture, so features stand out.
+// Starts at ':' so even the darkest parts keep a faint texture.
+const RAMP = ':;=+*#%@'
 const COLS = 92
 const CELL = 0.79 // cell width / height; tighter than the font so rows overlap
 const INK_LINES = 0.6 // how much a cell's darkest subpixel (line work) pulls it dark
-const GAMMA = 1.4 // >1 keeps mid-tones (skin) lighter than highlights
+const LOW = 0.04 // brightness percentiles that map to the ends of the ramp
+const HIGH = 0.97
 const RADIUS = 46 // px of cursor influence
 const PUSH = 2600
 const SPRING = 90
@@ -111,26 +113,19 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
         }
       }
 
-      // Rank brightness within the subject so flat cartoon colours spread over
-      // the ramp: skin lands mid-ramp and highlights (teeth, collar) above it.
+      // Stretch brightness between percentiles of the subject, then snap to
+      // the ramp's steps so each flat colour becomes one even texture.
       const sorted = cells.filter((k) => k.cover >= 0.3).map((k) => k.light).sort((x, y) => x - y)
-      const rank = (l: number) => {
-        let lo = 0
-        let hi = sorted.length
-        while (lo < hi) {
-          const mid = (lo + hi) >> 1
-          if (sorted[mid] < l) lo = mid + 1
-          else hi = mid
-        }
-        return lo / (sorted.length || 1)
-      }
+      const lo = sorted[Math.floor(sorted.length * LOW)] ?? 0
+      const hi = sorted[Math.floor(sorted.length * HIGH)] ?? 1
+      const tone = (l: number) => Math.min(1, Math.max(0, (l - lo) / (hi - lo || 1)))
 
       glyphs = []
       cells.forEach(({ cover, light, line }, i) => {
         if (cover < 0.3 && line < 0.5) return
         const c = i % COLS
         const r = Math.floor(i / COLS)
-        const amount = Math.max(Math.pow(rank(light), GAMMA), line * 0.92)
+        const amount = Math.max(tone(light), line)
         glyphs.push({
           ch: RAMP[Math.round(amount * (RAMP.length - 1))],
           alpha: 0.45 + 0.55 * amount,
