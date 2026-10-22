@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { about, contributions, education, experience, profile, projects, skills, writing } from '../data'
+import { about, contributions, education, experience, neofetch, profile, projects, skills, type Job } from '../data'
 import { useTldr } from '../components/Layout'
 import ProjectCard from '../components/ProjectCard'
 import ActivityGraph from '../components/ActivityGraph'
@@ -10,6 +10,7 @@ import {
   Button,
   IconFile,
   IconGithub,
+  IconKeyboard,
   IconLinkedin,
   IconMail,
   IconPlay,
@@ -18,7 +19,6 @@ import {
   Section,
   Tag,
   accentFor,
-  formatMonth,
 } from '../components/ui'
 
 const LOGO = String.raw`██╗██╗
@@ -57,7 +57,6 @@ export default function Home() {
       <Skills />
       <About />
       <Education />
-      <Writing />
       <Contact />
     </>
   )
@@ -65,13 +64,17 @@ export default function Home() {
 
 function Hero() {
   const openTldr = useTldr()
-  const rows: [string, string, string?][] = [
-    ['role', profile.title.toLowerCase()],
-    ['focus', profile.focus.toLowerCase()],
-    ['education', profile.degree],
-    ['location', profile.location],
-    ['status', profile.status, 'text-green'],
-  ]
+  const info = useRef<HTMLDivElement>(null)
+  const [infoHeight, setInfoHeight] = useState<number>()
+
+  // The portrait is square, so sizing its width to the readout's height
+  // lines the two columns up top and bottom.
+  useEffect(() => {
+    const el = info.current!
+    const ro = new ResizeObserver(() => setInfoHeight(el.offsetHeight))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const logo = (
     <pre
@@ -81,9 +84,11 @@ function Hero() {
       {LOGO}
     </pre>
   )
+  const swatches = ['bg-rosewater', 'bg-flamingo', 'bg-pink', 'bg-purple', 'bg-red', 'bg-maroon', 'bg-orange', 'bg-amber', 'bg-green', 'bg-teal', 'bg-cyan', 'bg-sapphire', 'bg-blue', 'bg-lavender']
 
   return (
     <section className="relative pt-10 sm:pt-16">
+      <h1 className="sr-only">{profile.name}, {profile.title}</h1>
       <a
         href="#contact"
         className="stamp absolute right-0 top-12 hidden rounded-[3px] border-2 border-green/60 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-green/80 hover:border-green hover:text-green sm:block"
@@ -91,46 +96,49 @@ function Hero() {
         open to work
       </a>
       <div className="text-[13px] text-muted">
-        <span className="text-green">{profile.handle}@lai</span>:<span className="text-blue">~</span>$ neofetch
+        <span className="text-purple">{profile.handle}</span>
+        <span className="text-muted">@</span>
+        <span className="text-blue">{profile.host}</span>:<span className="text-teal">~</span>$ neofetch
       </div>
 
-      <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10">
+      <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-9">
         {profile.portrait ? (
-          <div className="w-[200px] shrink-0 sm:w-[230px]">
+          <div className="w-[220px] shrink-0 sm:w-[var(--portrait)]" style={{ '--portrait': `${infoHeight ?? 300}px` } as CSSProperties}>
             <AsciiPortrait src={profile.portrait} alt={`ASCII portrait of ${profile.name}`} fallback={logo} />
           </div>
         ) : (
           logo
         )}
 
-        <div className="min-w-0 flex-1 text-[13px]">
+        <div ref={info} className="min-w-0 flex-1 text-[14px] leading-[1.6]">
           <div>
-            <span className="text-blue">iverson</span>
+            <span className="font-medium text-purple">{profile.handle}</span>
             <span className="text-muted">@</span>
-            <span className="text-blue">lai</span>
+            <span className="font-medium text-blue">{profile.host}</span>
           </div>
-          <div className="text-faint">───────────</div>
-          <dl className="mt-1 grid grid-cols-[84px_1fr] gap-x-2 gap-y-[3px] sm:grid-cols-[96px_1fr]">
-            {rows.map(([k, v, c]) => (
-              <div key={k} className="contents">
-                <dt className="text-amber">{k}</dt>
-                <dd className={c ?? 'text-fg-dim'}>{v}</dd>
+          <div className="text-faint" aria-hidden>
+            {'─'.repeat(profile.handle.length + profile.host.length + 1)}
+          </div>
+          <dl className="grid grid-cols-[96px_1fr] gap-x-2 sm:grid-cols-[104px_1fr]">
+            {neofetch.map((f) => (
+              <div key={f.key} className="contents">
+                <dt className="text-blue">{f.key}</dt>
+                <dd className={f.accent ?? 'text-fg-dim'}>{f.value}</dd>
               </div>
             ))}
           </dl>
-          <div className="mt-3 flex gap-0" aria-hidden>
-            {['bg-red', 'bg-orange', 'bg-amber', 'bg-green', 'bg-cyan', 'bg-blue', 'bg-purple', 'bg-fg-dim'].map((c) => (
-              <span key={c} className={`h-3.5 w-6 ${c}`} />
+          <div className="mt-3 flex flex-wrap" aria-hidden>
+            {swatches.map((c) => (
+              <span key={c} className={`h-3.5 w-5 ${c}`} />
             ))}
           </div>
         </div>
       </div>
 
-      <h1 className="mt-10 text-[34px] font-bold leading-tight tracking-tight text-fg sm:text-[44px]">
-        {profile.name}
+      <p className="mt-9 max-w-[640px] text-[14.5px] leading-relaxed text-fg-dim">
+        {profile.pitch}
         <span className="cursor" />
-      </h1>
-      <p className="mt-4 max-w-[640px] text-[14.5px] leading-relaxed text-fg-dim">{profile.pitch}</p>
+      </p>
       {profile.current && (
         <p className="mt-3 text-[13.5px] text-muted">
           <span className="text-green">▸</span> building <span className="font-medium text-amber">{profile.current.name}</span> —{' '}
@@ -146,12 +154,15 @@ function Hero() {
           email
         </Button>
         <ActionButton onClick={openTldr}>tl;dr</ActionButton>
-        <span className="mx-1 hidden h-5 w-px bg-line sm:block" />
-        <a href={profile.github} target="_blank" rel="noreferrer" aria-label="GitHub" className="p-2 text-muted hover:text-fg">
-          <IconGithub />
+        <span className="mx-1.5 hidden h-6 w-px bg-line sm:block" />
+        <a href={profile.github} target="_blank" rel="noreferrer" aria-label="GitHub" title="github" className="p-1.5 text-muted transition-colors hover:text-fg">
+          <IconGithub size={21} />
         </a>
-        <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="p-2 text-muted hover:text-fg">
-          <IconLinkedin />
+        <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" title="linkedin" className="p-1.5 text-muted transition-colors hover:text-blue">
+          <IconLinkedin size={21} />
+        </a>
+        <a href={profile.monkeytype} target="_blank" rel="noreferrer" aria-label="Monkeytype" title="monkeytype" className="p-1.5 text-muted transition-colors hover:text-amber">
+          <IconKeyboard size={22} />
         </a>
       </div>
     </section>
@@ -216,10 +227,14 @@ function Activity() {
   )
 }
 
+const jobDot: Record<string, string> = { engineering: 'bg-blue', research: 'bg-green', other: 'bg-orange' }
+
 function Experience() {
-  const dot: Record<string, string> = { engineering: 'bg-blue', research: 'bg-green' }
+  const main = experience.filter((j) => j.kind !== 'other')
+  const more = experience.filter((j) => j.kind === 'other')
+  const [showMore, setShowMore] = useState(false)
   // The current role starts expanded; the rest show their first bullet.
-  const [open, setOpen] = useState(() => new Set(experience.filter((j) => j.current).map((j) => j.org)))
+  const [open, setOpen] = useState(() => new Set(main.filter((j) => j.current).map((j) => j.org)))
   const toggle = (org: string) =>
     setOpen((prev) => {
       const next = new Set(prev)
@@ -235,60 +250,96 @@ function Experience() {
         arg="experience.log"
         right={
           <span className="flex gap-3 text-[11px] text-muted">
-            <span className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue" /> engineering
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-green" /> research
-            </span>
+            {(['engineering', 'research', 'other'] as const).map((k) => (
+              <span key={k} className="flex items-center gap-1.5">
+                <span className={`h-1.5 w-1.5 rounded-full ${jobDot[k]}`} /> {k}
+              </span>
+            ))}
           </span>
         }
       />
       <ol className="relative ml-[3px] border-l border-line">
-        {experience.map((j) => (
-          <li key={j.org} className="relative pb-9 pl-6 last:pb-0">
-            <span className={`absolute -left-[4px] top-[7px] h-[7px] w-[7px] rounded-full ${dot[j.kind]}`} />
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-              <h3 className="text-[14.5px] text-fg">
-                {j.role} <span className="text-muted">@</span> <span className="text-blue">{j.org}</span>
-              </h3>
-              <span className="shrink-0 text-[12px] text-muted">
-                {j.current && <span className="mr-2 text-green">● now</span>}
-                {j.dates}
-              </span>
-            </div>
-            <div className="mt-0.5 text-[12px] text-faint">{j.place}</div>
-            <ul className="mt-3 space-y-2">
-              <Bullet text={j.bullets[0]} />
-            </ul>
-            {j.bullets.length > 1 && (
-              <>
-                <div
-                  id={`job-${j.org}`}
-                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${open.has(j.org) ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
-                >
-                  <ul className="space-y-2 overflow-hidden" inert={!open.has(j.org)}>
-                    {j.bullets.slice(1).map((b) => (
-                      <Bullet key={b} text={b} className="first:mt-2" />
-                    ))}
-                  </ul>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => toggle(j.org)}
-                  aria-expanded={open.has(j.org)}
-                  aria-controls={`job-${j.org}`}
-                  className="mt-2 flex cursor-pointer items-center gap-1.5 text-[12px] text-muted hover:text-blue"
-                >
-                  <span className={`inline-block transition-transform duration-200 ${open.has(j.org) ? 'rotate-90' : ''}`}>▸</span>
-                  {open.has(j.org) ? 'less' : `${j.bullets.length - 1} more`}
-                </button>
-              </>
-            )}
-          </li>
+        {main.map((j) => (
+          <JobEntry key={j.org} job={j} open={open.has(j.org)} onToggle={() => toggle(j.org)} />
         ))}
       </ol>
+
+      {more.length > 0 && (
+        <div className="mt-8">
+          <button
+            type="button"
+            onClick={() => setShowMore((v) => !v)}
+            aria-expanded={showMore}
+            aria-controls="more-experience"
+            className="flex cursor-pointer items-center gap-2 text-[12.5px] text-muted hover:text-orange"
+          >
+            <span className={`inline-block transition-transform duration-200 ${showMore ? 'rotate-90' : ''}`}>▸</span>
+            {showMore ? 'hide' : `${more.length} more roles`}
+            <span className="text-faint">· sales, management, hospitality, photography, campus sustainability</span>
+          </button>
+          <div
+            id="more-experience"
+            className={`grid transition-[grid-template-rows] duration-500 ease-out ${showMore ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+          >
+            <div className="overflow-hidden" inert={!showMore}>
+              <ol className="relative ml-[3px] mt-6 border-l border-line">
+                {more.map((j) => (
+                  <JobEntry key={j.org} job={j} open />
+                ))}
+              </ol>
+            </div>
+          </div>
+        </div>
+      )}
     </Section>
+  )
+}
+
+// One timeline entry. Without onToggle every bullet shows; with it, the
+// first bullet shows and the rest fold behind a "N more" toggle.
+function JobEntry({ job: j, open, onToggle }: { job: Job; open: boolean; onToggle?: () => void }) {
+  const id = `job-${j.org.toLowerCase().replace(/\W+/g, '-')}`
+  const folded = onToggle && j.bullets.length > 1
+  return (
+    <li className="relative pb-9 pl-6 last:pb-0">
+      <span className={`absolute -left-[4px] top-[7px] h-[7px] w-[7px] rounded-full ${jobDot[j.kind]}`} />
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+        <h3 className="text-[14.5px] text-fg">
+          {j.role} <span className="text-muted">@</span> <span className="text-blue">{j.org}</span>
+        </h3>
+        <span className="shrink-0 text-[12px] text-muted">
+          {j.current && <span className="mr-2 text-green">● now</span>}
+          {j.dates}
+        </span>
+      </div>
+      <div className="mt-0.5 text-[12px] text-faint">{j.place}</div>
+      <ul className="mt-3 space-y-2">
+        {(folded ? j.bullets.slice(0, 1) : j.bullets).map((b) => (
+          <Bullet key={b} text={b} />
+        ))}
+      </ul>
+      {folded && (
+        <>
+          <div id={id} className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+            <ul className="space-y-2 overflow-hidden" inert={!open}>
+              {j.bullets.slice(1).map((b) => (
+                <Bullet key={b} text={b} className="first:mt-2" />
+              ))}
+            </ul>
+          </div>
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-expanded={open}
+            aria-controls={id}
+            className="mt-2 flex cursor-pointer items-center gap-1.5 text-[12px] text-muted hover:text-blue"
+          >
+            <span className={`inline-block transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▸</span>
+            {open ? 'less' : `${j.bullets.length - 1} more`}
+          </button>
+        </>
+      )}
+    </li>
   )
 }
 
@@ -363,7 +414,7 @@ function Education() {
       <Prompt cmd="cat" arg="education.txt" />
       <div className="grid gap-4 sm:grid-cols-2">
         {education.map((e) => (
-          <div key={e.school} className="rounded-[4px] border border-line p-5">
+          <div key={e.school} className="rounded-[4px] border border-line bg-surface p-5">
             <div className="text-[12px] text-muted">{e.dates.toLowerCase()}</div>
             <div className="mt-2 text-[14px] text-fg">{e.degree}</div>
             <div className="mt-0.5 text-[13px] text-blue">{e.school}</div>
@@ -371,33 +422,6 @@ function Education() {
           </div>
         ))}
       </div>
-    </Section>
-  )
-}
-
-function Writing() {
-  return (
-    <Section>
-      <Prompt
-        cmd="ls"
-        arg="writing/"
-        right={
-          <Link viewTransition to="/writing" className="text-[12px] text-muted hover:text-blue">
-            all writing →
-          </Link>
-        }
-      />
-      <ul className="space-y-3">
-        {writing.slice(0, 3).map((a) => (
-          <li key={a.href}>
-            <a href={a.href} target="_blank" rel="noreferrer" className="group block rounded-[4px] border border-line p-5 transition-colors hover:border-line-strong hover:bg-surface">
-              <div className="text-[12px] text-muted">{formatMonth(a.date)}</div>
-              <h3 className="mt-1.5 text-[15px] text-fg group-hover:text-blue">{a.title}</h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-muted">{a.summary}</p>
-            </a>
-          </li>
-        ))}
-      </ul>
     </Section>
   )
 }

@@ -3,7 +3,8 @@
 
 export const profile = {
   name: 'Iverson Lai',
-  handle: 'iverson',
+  handle: 'iversonlai',
+  host: 'archlinux', // i use arch, btw
   title: 'Software Engineer',
   focus: 'C/C++ · Systems · Machine Learning',
   pitch:
@@ -15,6 +16,7 @@ export const profile = {
   email: 'iversonlai@icloud.com',
   github: 'https://github.com/anontriton',
   linkedin: 'https://www.linkedin.com/in/iversonlai',
+  monkeytype: 'https://monkeytype.com/profile/iversonlai0',
   resume: '/resume.pdf',
   // Photo for the ASCII portrait in the hero. Drop it in public/images/ and
   // set the path; a cut-out PNG (transparent background) reads best.
@@ -25,6 +27,31 @@ export const profile = {
   learning: 'contributing to large open-source C++ codebases',
   sourceRepo: 'https://github.com/anontriton/portfolio',
 }
+
+// Months since a YYYY-MM start, as neofetch-style "3 years, 4 months".
+// Computed when the page loads, so it never needs updating by hand.
+function uptime(start: string) {
+  const [y, m] = start.split('-').map(Number)
+  const now = new Date()
+  const months = (now.getFullYear() - y) * 12 + now.getMonth() + 1 - m
+  const plural = (n: number, unit: string) => (n ? `${n} ${unit}${n === 1 ? '' : 's'}` : '')
+  return [plural(Math.floor(months / 12), 'year'), plural(months % 12, 'month')].filter(Boolean).join(', ') || 'just booted'
+}
+
+// The hero's neofetch readout, top to bottom. `accent` colours the value.
+export const neofetch: { key: string; value: string; accent?: string }[] = [
+  { key: 'role', value: 'software engineer' },
+  { key: 'focus', value: 'c/c++ · systems · machine learning' },
+  { key: 'kernel', value: 'coffee', accent: 'text-orange' },
+  { key: 'uptime', value: uptime('2023-06') }, // started CS in June 2023
+  { key: 'languages', value: 'C, C++, Python' },
+  { key: 'editor', value: 'neovim, zed' },
+  { key: 'education', value: 'M.S. Computer Science, Tufts (2026)' },
+  { key: 'background', value: 'biotechnology, research, leadership' },
+  { key: 'interests', value: 'biotech, game dev, open source' },
+  { key: 'location', value: 'San Diego, CA' },
+  { key: 'status', value: 'open to entry-level SWE roles', accent: 'text-green' },
+]
 
 export const about = [
   "I'm a software engineer with a master's in Computer Science from Tufts and a background in environmental science and scientific research.",
@@ -283,7 +310,8 @@ export type Job = {
   place: string
   dates: string
   current?: boolean
-  kind: 'engineering' | 'research'
+  // 'other' roles are listed in a collapsed "more experience" group
+  kind: 'engineering' | 'research' | 'other'
   bullets: string[]
 }
 
@@ -321,7 +349,65 @@ export const experience: Job[] = [
     kind: 'research',
     bullets: [
       'Supported research using underwater acoustic vector sensors to track humpback whale movement.',
-      'Annotated and visualized acoustic tracking data in MATLAB using cross-correlation matrices and trajectory plots.',
+      'Aggregated and visualized acoustic vector sensor data in MATLAB: azimuthal tracks, line histograms, and score matrices.',
+      'Helped maintain sensor and hydrophone equipment: soldering, battery voltage testing, and inventory.',
+    ],
+  },
+  {
+    role: 'Field Sales',
+    org: 'Rivian',
+    place: 'San Diego, CA',
+    dates: '2024 – 2025',
+    kind: 'other',
+    bullets: [
+      'Collaborated on 15+ outreach events with local businesses, generating 65+ qualified leads in 2024.',
+      'Supported vehicle deals totaling over $1.8M across the team in the first two months after the store opened.',
+      'Left to focus full-time on my master’s capstone.',
+    ],
+  },
+  {
+    role: 'General Manager',
+    org: 'Xin Chao Eatery',
+    place: 'San Diego, CA',
+    dates: '2023 – 2024',
+    kind: 'other',
+    bullets: [
+      'Managed 30+ front-of-house staff: staffing, payroll, tips, training, conflict resolution, inventory, and maintenance.',
+      'Overhauled 15+ beverage menu items to improve consistency, workflow, and guest experience.',
+    ],
+  },
+  {
+    role: 'Owner & Photographer',
+    org: 'ivermino Photography Studio',
+    place: 'Self-employed',
+    dates: '2021 – present',
+    current: true,
+    kind: 'other',
+    bullets: [
+      '100+ client engagements across weddings, couples, graduations, and events.',
+      'Run the whole business myself: client conversations, planning, scheduling, shooting, editing, and delivery.',
+    ],
+  },
+  {
+    role: 'Server & Lead',
+    org: 'Din Tai Fung',
+    place: 'San Diego, CA',
+    dates: '2020 – 2023',
+    kind: 'other',
+    bullets: [
+      'Worked in a high-volume restaurant doing over $100k in daily food sales.',
+      'Trained 10+ new hires and helped manage complex guest and reservation flow.',
+    ],
+  },
+  {
+    role: 'Project Coordinator',
+    org: 'UCSD HDH Wellness and Engagement',
+    place: 'La Jolla, CA',
+    dates: '2018 – 2020',
+    kind: 'other',
+    bullets: [
+      'Coordinated 10+ zero-waste events serving 2,000+ students with over 99% landfill diversion.',
+      'Developed sustainability approaches adopted by 8+ additional campus events.',
     ],
   },
 ]
@@ -350,6 +436,7 @@ export type Article = {
   readTime?: string
 }
 
+// Not shown on the site yet; /blog is an empty placeholder for now.
 // Only published articles. Planned: SIMD GEMM optimization, autodiff in C,
 // utility AI in Godot, first open-source C++ contribution.
 export const writing: Article[] = [

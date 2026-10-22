@@ -39,8 +39,7 @@ function Nav() {
     <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
       <nav className="mx-auto flex h-12 max-w-[860px] items-center justify-between gap-4 px-4 text-[13px] sm:px-6">
         <NavLink viewTransition to="/" className="min-w-0 truncate text-fg hover:text-blue">
-          <span className="text-green">{profile.handle}</span>
-          <span className="text-muted">@lai</span>
+          <span className="text-purple">{profile.handle}</span>
           <span className="hidden text-muted sm:inline">:</span>
           <span className="hidden text-blue sm:inline">{path}</span>
         </NavLink>
@@ -48,8 +47,8 @@ function Nav() {
           <NavLink viewTransition to="/projects" className={link}>
             projects
           </NavLink>
-          <NavLink viewTransition to="/writing" className={link}>
-            writing
+          <NavLink viewTransition to="/blog" className={link}>
+            blog
           </NavLink>
           <a
             href={profile.resume}

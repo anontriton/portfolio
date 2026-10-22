@@ -3,27 +3,35 @@
 @import '@fontsource/jetbrains-mono/latin-500.css';
 @import '@fontsource/jetbrains-mono/latin-700.css';
 
-/* Tokyo Night–inspired palette */
+/* Catppuccin Mocha (catppuccin.com/palette) — existing token names map onto
+   its roles so components keep working; the extra accents add colour */
 @theme {
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-bg: #0f1117;
-  --color-surface: #151821;
-  --color-raised: #1a1e2a;
-  --color-line: #232838;
-  --color-line-strong: #2f3648;
-  --color-fg: #c0caf5;
-  --color-fg-dim: #a9b1d6;
-  --color-muted: #6b7394;
-  --color-faint: #4a5170;
+  --color-bg: #1e1e2e; /* base */
+  --color-surface: #181825; /* mantle */
+  --color-raised: #313244; /* surface0 */
+  --color-line: #313244; /* surface0 */
+  --color-line-strong: #45475a; /* surface1 */
+  --color-fg: #cdd6f4; /* text */
+  --color-fg-dim: #bac2de; /* subtext1 */
+  --color-muted: #7f849c; /* overlay1 */
+  --color-faint: #585b70; /* surface2 */
 
-  --color-blue: #7aa2f7;
-  --color-cyan: #7dcfff;
-  --color-green: #9ece6a;
-  --color-amber: #e0af68;
-  --color-orange: #ff9e64;
-  --color-red: #f7768e;
-  --color-purple: #bb9af7;
+  --color-blue: #89b4fa;
+  --color-cyan: #89dceb; /* sky */
+  --color-green: #a6e3a1;
+  --color-amber: #f9e2af; /* yellow */
+  --color-orange: #fab387; /* peach */
+  --color-red: #f38ba8;
+  --color-purple: #cba6f7; /* mauve */
+  --color-pink: #f5c2e7;
+  --color-teal: #94e2d5;
+  --color-lavender: #b4befe;
+  --color-sapphire: #74c7ec;
+  --color-maroon: #eba0ac;
+  --color-flamingo: #f2cdcd;
+  --color-rosewater: #f5e0dc;
 }
 
 html {

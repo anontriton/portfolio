@@ -1,7 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 
-const accents = ['text-blue', 'text-green', 'text-amber', 'text-purple', 'text-cyan', 'text-orange', 'text-red']
+const accents = ['text-blue', 'text-green', 'text-pink', 'text-amber', 'text-purple', 'text-teal', 'text-orange', 'text-lavender', 'text-red', 'text-cyan']
 
 export function accentFor(i: number) {
   return accents[i % accents.length]
@@ -124,14 +124,20 @@ const svg = {
   'aria-hidden': true,
 }
 
-export const IconGithub = () => (
-  <svg {...svg}>
+export const IconGithub = ({ size = 15 }: { size?: number }) => (
+  <svg {...svg} width={size} height={size}>
     <path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
   </svg>
 )
-export const IconLinkedin = () => (
-  <svg {...svg}>
+export const IconLinkedin = ({ size = 15 }: { size?: number }) => (
+  <svg {...svg} width={size} height={size}>
     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+  </svg>
+)
+export const IconKeyboard = ({ size = 15 }: { size?: number }) => (
+  <svg {...svg} width={size} height={size}>
+    <rect x="2" y="6" width="20" height="12" rx="2" />
+    <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10" />
   </svg>
 )
 export const IconMail = () => (

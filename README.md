@@ -17,10 +17,12 @@ npm run preview   # serve dist/ locally
 
 Everything on the site comes from [`src/data.ts`](src/data.ts):
 
-- `profile` — name, links, status line, optional "currently building" entry
+- `profile` — name, links, bio (`pitch`), status line, optional "currently building" entry
+- `neofetch` — the hero readout, top to bottom; `uptime` counts up from June 2023 on its own
 - `projects` — cards and case-study pages (`/projects/:slug`); `featured` controls the tl;dr
-- `experience`, `education`, `skills`, `about`
-- `writing` — published articles only
+- `experience` — `kind: 'other'` roles sit in a collapsed "more roles" group
+- `education`, `skills`, `about` (the about.md section)
+- `writing` — articles, not shown yet; `/blog` is an empty placeholder
 - `contributions` — open-source PRs; the homepage section appears once this has entries
 
 Images go in `public/images/`; the resume is `public/resume.pdf`.
