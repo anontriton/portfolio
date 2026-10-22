@@ -42,6 +42,12 @@ export async function POST(request: Request) {
   if (!key || !to) {
     // shows in Vercel → Deployment → Logs; visitors only see the generic error
     console.error('contact form missing env:', [!key && 'RESEND_API_KEY', !to && 'CONTACT_TO'].filter(Boolean).join(', '))
+    // TEMP diagnostics: names only, never values
+    console.error('contact env check:', {
+      vercelEnv: process.env.VERCEL_ENV,
+      branch: process.env.VERCEL_GIT_COMMIT_REF,
+      similar: Object.keys(process.env).filter((k) => /resend|contact/i.test(k)),
+    })
     return fail(500, 'contact form is not configured')
   }
 
