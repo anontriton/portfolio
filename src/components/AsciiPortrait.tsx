@@ -21,7 +21,7 @@ const INK_LINES = 0.6 // how much a cell's darkest subpixel (line work) pulls it
 const LOW = 0.04 // brightness percentiles that map to the ends of the ramp;
 const HIGH = 0.995 // high enough that skin sits a step below the teeth
 const TINT = 0.25 // how much of the picture's own colour tints the ink
-const LIP_GLYPH = '+' // sparser than the skin around it, so lips read darker
+const LIP_GLYPH = '+' // same colour as skin but sparser, so lips read a shade darker
 const RADIUS = 46 // px of cursor influence
 const PUSH = 2600
 const SPRING = 90
@@ -38,8 +38,7 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
     const ctx = canvas.getContext('2d')!
     const css = getComputedStyle(document.documentElement)
     const ink = hexRgb(css.getPropertyValue('--color-rosewater').trim() || '#f5e0dc')
-    // the one spot of colour: the smile
-    const lipInk = css.getPropertyValue('--color-red').trim() || '#f38ba8'
+    // teeth are the brightest thing on the face
     const teethInk = '#ffffff'
     const accent = css.getPropertyValue('--color-blue').trim() || '#89b4fa'
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -140,7 +139,7 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
         const part = mouth[i]
         glyphs.push({
           ch: part === TEETH ? RAMP[RAMP.length - 1] : part === LIPS ? LIP_GLYPH : RAMP[Math.round(amount * (RAMP.length - 1))],
-          color: part === TEETH ? teethInk : part === LIPS ? lipInk : tint(ink, cover > 0 ? rgb : ink),
+          color: part === TEETH ? teethInk : tint(ink, cover > 0 ? rgb : ink),
           alpha: part ? 1 : 0.45 + 0.55 * amount,
           hx: (c + 0.5) * cw,
           hy: (r + 0.5) * chh,
@@ -278,8 +277,8 @@ function keyBackdrop(px: Uint8ClampedArray, cols: number, rows: number) {
 const LIPS = 1
 const TEETH = 2
 
-// Picks out the smile by colour so it can be drawn as the portrait's one
-// accent. Lips are a redder orange than skin (hue ~10–21° vs ~27°) and a bit
+// Picks out the smile by colour so it can be drawn distinctly: lips in a
+// sparser glyph, teeth in bright white. Lips are a redder orange than skin (hue ~10–21° vs ~27°) and a bit
 // darker; the mouth is the largest connected patch of them. Teeth are the
 // near-white cells inside that patch's box — which keeps a white collar out.
 function findMouth(rgb: (number[] | null)[], cols: number, rows: number) {
