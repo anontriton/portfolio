@@ -277,7 +277,7 @@ examples/mnist/   digit classifier linked against libml.a`,
     file: 'touchline',
     tagline: 'A Fantasy Premier League decision assistant that shows its working.',
     description:
-      "Touchline answers one question each week: what should I do with my team? It projects every player's expected points from underlying stats, minutes, and fixtures, then weighs transfers, captaincy, and chips against those numbers. Every recommendation breaks down into the parts behind it, so you can see why it's suggested and how confident it is. I use it daily as my own app on my phone; the public demo gives you a random squad to play with on a weekly copy of real data.",
+      "Touchline answers one question each week: what should I do with my team? It projects every player's expected points from underlying stats, minutes, and fixtures, then weighs transfers, captaincy, and chips against those numbers. Every recommendation breaks down into the parts behind it, so you can see why it's suggested and how confident it is. I use it regularly as my own app on my phone; the public demo gives you a random squad to play with on a weekly copy of real data.",
     year: '2026',
     tags: ['web', 'ml'],
     stack: ['Next.js 16', 'React 19', 'TypeScript', 'SQLite', 'Drizzle', 'Claude API', 'Tailwind', 'shadcn/ui', 'Recharts', 'Docker', 'Railway'],
@@ -322,7 +322,7 @@ examples/mnist/   digit classifier linked against libml.a`,
       'A sandboxed public demo: each visitor gets their own SQLite database with the shared data attached read-only, so nothing a visitor does can reach outside services or my data. The demo refreshes its own data each week.',
     ],
     links: [{ label: 'live demo', href: 'https://touchline.iversonlai.dev', primary: true }],
-    note: 'Code available on request. A personal, non-commercial project, not affiliated with or endorsed by the Premier League or Fantasy Premier League.',
+    note: 'A personal, non-commercial project, not affiliated with or endorsed by the Premier League or Fantasy Premier League.',
     sections: [
       {
         heading: 'one engine, every decision',
