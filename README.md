@@ -1,6 +1,6 @@
 # portfolio
 
-Personal site for Iverson Lai — software engineer (C/C++ · systems · ML).
+Source for [iversonlai.dev](https://iversonlai.dev) — personal site for Iverson Lai — software engineer (C/C++ · systems · ML).
 
 Built with React, Vite, Tailwind CSS v4, and React Router. Static output, deployed on Vercel.
 
