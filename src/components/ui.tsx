@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 
 const accents = ['text-blue', 'text-green', 'text-amber', 'text-purple', 'text-cyan', 'text-orange', 'text-red']
@@ -20,8 +20,36 @@ export function Prompt({ cmd, arg, right, id }: { cmd: string; arg?: string; rig
   )
 }
 
+// Fades in the first time it scrolls into view (see .reveal in index.css).
 export function Section({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <section className={`mt-16 sm:mt-20 ${className}`}>{children}</section>
+  const ref = useRef<HTMLElement>(null)
+  useEffect(() => {
+    const el = ref.current!
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return
+        el.dataset.shown = ''
+        io.disconnect()
+      },
+      { rootMargin: '0px 0px -8% 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return (
+    <section ref={ref} className={`reveal mt-16 sm:mt-20 ${className}`}>
+      {children}
+    </section>
+  )
+}
+
+export function LiveBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-[3px] border border-green/40 px-1.5 py-[2px] text-[10.5px] leading-none text-green">
+      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green" aria-hidden />
+      live
+    </span>
+  )
 }
 
 export function Tag({ children, color = 'text-fg-dim' }: { children: ReactNode; color?: string }) {
@@ -49,7 +77,7 @@ export function Button({ href, children, primary, icon, download }: ButtonProps)
   const cls = `${btnBase} ${primary ? btnPrimary : btnPlain}`
   if (href.startsWith('/') && !download && !href.endsWith('.pdf')) {
     return (
-      <RouterLink to={href} className={cls}>
+      <RouterLink to={href} viewTransition className={cls}>
         {icon}
         {children}
       </RouterLink>

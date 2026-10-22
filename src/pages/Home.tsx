@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { about, contributions, education, experience, profile, projects, skills, writing } from '../data'
 import { useTldr } from '../components/Layout'
 import ProjectCard from '../components/ProjectCard'
+import ActivityGraph from '../components/ActivityGraph'
+import AsciiPortrait from '../components/AsciiPortrait'
+import Ocean from '../components/Ocean'
 import {
   ActionButton,
   Button,
@@ -11,6 +14,7 @@ import {
   IconLinkedin,
   IconMail,
   IconPlay,
+  LiveBadge,
   Prompt,
   Section,
   Tag,
@@ -37,7 +41,7 @@ export default function Home() {
           cmd="ls"
           arg="projects/"
           right={
-            <Link to="/projects" className="text-[12px] text-muted hover:text-blue">
+            <Link viewTransition to="/projects" className="text-[12px] text-muted hover:text-blue">
               all projects →
             </Link>
           }
@@ -48,9 +52,11 @@ export default function Home() {
           ))}
         </div>
       </Section>
+      <Activity />
       <Experience />
       {contributions.length > 0 && <Contributions />}
       <Skills />
+      <Reef />
       <About />
       <Education />
       <Writing />
@@ -69,19 +75,35 @@ function Hero() {
     ['status', profile.status, 'text-green'],
   ]
 
+  const logo = (
+    <pre
+      aria-hidden
+      className="hidden shrink-0 select-none bg-gradient-to-b from-blue to-purple bg-clip-text text-[21px] leading-[1.12] text-transparent sm:block"
+    >
+      {LOGO}
+    </pre>
+  )
+
   return (
-    <section className="pt-10 sm:pt-16">
+    <section className="relative pt-10 sm:pt-16">
+      <a
+        href="#contact"
+        className="stamp absolute right-0 top-12 hidden rounded-[3px] border-2 border-green/60 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-green/80 hover:border-green hover:text-green sm:block"
+      >
+        open to work
+      </a>
       <div className="text-[13px] text-muted">
         <span className="text-green">{profile.handle}@lai</span>:<span className="text-blue">~</span>$ neofetch
       </div>
 
       <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10">
-        <pre
-          aria-hidden
-          className="hidden shrink-0 select-none bg-gradient-to-b from-blue to-purple bg-clip-text text-[21px] leading-[1.12] tet-transparent sm:block"
-        >
-          {LOGO}
-        </pre>
+        {profile.portrait ? (
+          <div className="w-[170px] shrink-0 sm:w-[190px]">
+            <AsciiPortrait src={profile.portrait} alt={`ASCII portrait of ${profile.name}`} fallback={logo} />
+          </div>
+        ) : (
+          logo
+        )}
 
         <div className="min-w-0 flex-1 text-[13px]">
           <div>
@@ -145,9 +167,12 @@ function Flagship() {
       <Prompt cmd="./bench" arg={`--project ${p.file}`} right={<span className="text-[11px] uppercase tracking-wider text-amber">flagship</span>} />
       <div className="rounded-[4px] border border-line bg-surface">
         <div className="border-b border-line p-5 sm:p-6">
-          <Link to={`/projects/${p.slug}`} className="group">
-            <h3 className="text-[19px] font-medium text-fg group-hover:text-blue">{p.name}</h3>
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link viewTransition to={`/projects/${p.slug}`} className="group">
+              <h3 className="text-[19px] font-medium text-fg group-hover:text-blue">{p.name}</h3>
+            </Link>
+            {p.links.some((l) => l.label === 'live demo') && <LiveBadge />}
+          </div>
           <p className="mt-2 text-[13.5px] leading-relaxed text-fg-dim">{p.tagline}</p>
         </div>
 
@@ -184,8 +209,27 @@ function Flagship() {
   )
 }
 
+function Activity() {
+  return (
+    <Section>
+      <Prompt cmd="git log" arg="--since=1.year --graph" />
+      <ActivityGraph />
+    </Section>
+  )
+}
+
 function Experience() {
   const dot: Record<string, string> = { engineering: 'bg-blue', research: 'bg-green' }
+  // The current role starts expanded; the rest show their first bullet.
+  const [open, setOpen] = useState(() => new Set(experience.filter((j) => j.current).map((j) => j.org)))
+  const toggle = (org: string) =>
+    setOpen((prev) => {
+      const next = new Set(prev)
+      if (next.has(org)) next.delete(org)
+      else next.add(org)
+      return next
+    })
+
   return (
     <Section>
       <Prompt
@@ -217,17 +261,45 @@ function Experience() {
             </div>
             <div className="mt-0.5 text-[12px] text-faint">{j.place}</div>
             <ul className="mt-3 space-y-2">
-              {j.bullets.map((b) => (
-                <li key={b} className="flex gap-2.5 text-[13px] leading-relaxed text-fg-dim">
-                  <span className="select-none text-faint">-</span>
-                  <span>{b}</span>
-                </li>
-              ))}
+              <Bullet text={j.bullets[0]} />
             </ul>
+            {j.bullets.length > 1 && (
+              <>
+                <div
+                  id={`job-${j.org}`}
+                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${open.has(j.org) ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+                >
+                  <ul className="space-y-2 overflow-hidden" inert={!open.has(j.org)}>
+                    {j.bullets.slice(1).map((b) => (
+                      <Bullet key={b} text={b} className="first:mt-2" />
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggle(j.org)}
+                  aria-expanded={open.has(j.org)}
+                  aria-controls={`job-${j.org}`}
+                  className="mt-2 flex cursor-pointer items-center gap-1.5 text-[12px] text-muted hover:text-blue"
+                >
+                  <span className={`inline-block transition-transform duration-200 ${open.has(j.org) ? 'rotate-90' : ''}`}>▸</span>
+                  {open.has(j.org) ? 'less' : `${j.bullets.length - 1} more`}
+                </button>
+              </>
+            )}
           </li>
         ))}
       </ol>
     </Section>
+  )
+}
+
+function Bullet({ text, className = '' }: { text: string; className?: string }) {
+  return (
+    <li className={`flex gap-2.5 text-[13px] leading-relaxed text-fg-dim ${className}`}>
+      <span className="select-none text-faint">-</span>
+      <span>{text}</span>
+    </li>
   )
 }
 
@@ -274,6 +346,20 @@ function Skills() {
   )
 }
 
+function Reef() {
+  return (
+    <Section>
+      <Prompt cmd="./reef" arg="--boids" right={<span className="hidden text-[11px] text-muted sm:inline">hover to scatter · click to splash</span>} />
+      <div className="overflow-hidden rounded-[4px] border border-line bg-surface">
+        <Ocean />
+      </div>
+      <p className="mt-2 text-[11.5px] text-muted">
+        a nod to my time at scripps tracking humpbacks · flocking from separation, alignment, and cohesion
+      </p>
+    </Section>
+  )
+}
+
 function About() {
   return (
     <Section>
@@ -312,7 +398,7 @@ function Writing() {
         cmd="ls"
         arg="writing/"
         right={
-          <Link to="/writing" className="text-[12px] text-muted hover:text-blue">
+          <Link viewTransition to="/writing" className="text-[12px] text-muted hover:text-blue">
             all writing →
           </Link>
         }

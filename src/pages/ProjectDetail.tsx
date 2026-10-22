@@ -12,7 +12,7 @@ export default function ProjectDetail() {
 
   return (
     <article className="pt-10 sm:pt-14">
-      <Link to="/projects" className="text-[12.5px] text-muted hover:text-blue">
+      <Link viewTransition to="/projects" className="text-[12.5px] text-muted hover:text-blue">
         ← cd ..
       </Link>
 
@@ -114,7 +114,7 @@ export default function ProjectDetail() {
       </Section>
 
       <div className="mt-16 border-t border-line pt-6">
-        <Link to={`/projects/${next.slug}`} className="group flex items-center justify-between text-[13px]">
+        <Link viewTransition to={`/projects/${next.slug}`} className="group flex items-center justify-between text-[13px]">
           <span className="text-muted">next project</span>
           <span className="text-fg group-hover:text-blue">{next.name} →</span>
         </Link>

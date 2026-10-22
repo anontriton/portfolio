@@ -16,6 +16,10 @@ export const profile = {
   github: 'https://github.com/anontriton',
   linkedin: 'https://www.linkedin.com/in/iversonlai',
   resume: '/resume.pdf',
+  // Photo for the ASCII portrait in the hero. Drop it in public/images/ and
+  // set the path; a cut-out PNG (transparent background) reads best.
+  // null shows the IL logo instead.
+  portrait: null as null | string,
   // Shown under "building" in the hero and tl;dr. Set to null to hide.
   current: null as null | { name: string; note: string; href?: string },
   learning: 'contributing to large open-source C++ codebases',
@@ -62,6 +66,9 @@ export type Project = {
   highlights: string[]
   links: Link[]
   image?: { src: string; alt: string; caption?: string }
+  // Short muted loop (public/videos/*.mp4) shown on the card in place of the
+  // image; the image doubles as its poster.
+  video?: string
   gallery?: { src: string; alt: string; caption?: string }[]
   sections?: Section[]
   note?: string

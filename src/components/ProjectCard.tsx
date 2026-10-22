@@ -1,15 +1,19 @@
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import type { Project } from '../data'
-import { Tag, accentFor } from './ui'
+import { LiveBadge, Tag, accentFor } from './ui'
 
 export default function ProjectCard({ project: p, wide }: { project: Project; wide?: boolean }) {
   const preview = p.sections?.find((s) => s.code)?.code
+  const live = p.links.some((l) => l.label === 'live demo')
   return (
     <Link
       to={`/projects/${p.slug}`}
+      viewTransition
       className={`group flex flex-col overflow-hidden rounded-[4px] border border-line bg-surface transition-colors hover:border-line-strong ${wide ? 'sm:col-span-2' : ''}`}
     >
-      {p.image && (
+      {p.video && <CardVideo src={p.video} poster={p.image?.src} label={p.image?.alt ?? p.name} />}
+      {p.image && !p.video && (
         <div className="aspect-[16/9] overflow-hidden border-b border-line bg-raised">
           <img
             src={p.image.src}
@@ -27,7 +31,10 @@ export default function ProjectCard({ project: p, wide }: { project: Project; wi
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="text-[15px] font-medium text-fg group-hover:text-blue">{p.name}</h3>
-          <span className="shrink-0 text-[11.5px] text-faint">{p.year}</span>
+          <span className="flex shrink-0 items-center gap-2 text-[11.5px] text-faint">
+            {live && <LiveBadge />}
+            {p.year}
+          </span>
         </div>
         <div className="mt-0.5 text-[11.5px] text-muted">~/{p.file}</div>
         <p className="mt-3 text-[13px] leading-relaxed text-fg-dim">{p.tagline}</p>
@@ -52,5 +59,45 @@ export default function ProjectCard({ project: p, wide }: { project: Project; wi
         </div>
       </div>
     </Link>
+  )
+}
+
+// Plays while the card is on screen; with reduced motion, only on hover.
+function CardVideo({ src, poster, label }: { src: string; poster?: string; label: string }) {
+  const ref = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = ref.current!
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const card = video.closest('a')!
+    const play = () => video.play().catch(() => {})
+    const pause = () => video.pause()
+    if (reduce) {
+      card.addEventListener('mouseenter', play)
+      card.addEventListener('mouseleave', pause)
+      return () => {
+        card.removeEventListener('mouseenter', play)
+        card.removeEventListener('mouseleave', pause)
+      }
+    }
+    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? play() : pause()), { threshold: 0.5 })
+    io.observe(video)
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <div className="aspect-[16/9] overflow-hidden border-b border-line bg-raised">
+      <video
+        ref={ref}
+        src={src}
+        poster={poster}
+        aria-label={label}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className="h-full w-full object-cover opacity-90 transition duration-300 group-hover:scale-[1.02] group-hover:opacity-100"
+      />
+    </div>
   )
 }

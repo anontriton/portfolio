@@ -25,6 +25,10 @@ Everything on the site comes from [`src/data.ts`](src/data.ts):
 
 Images go in `public/images/`; the resume is `public/resume.pdf`.
 
+- **ASCII portrait** — put a photo in `public/images/` and set `profile.portrait` to its path. A cut-out PNG with a transparent background works best; until then the hero shows the `IL` logo.
+- **Project videos** — put a short muted clip in `public/videos/` and set the project's `video`. Its `image` becomes the poster frame.
+- **Activity graph** — `scripts/fetch-contributions.mjs` pulls the last year of GitHub contributions before every `dev` and `build` (no token needed). If it can't reach GitHub, the graph is hidden.
+
 ## Deploy
 
 Import the repo in Vercel (framework preset: Vite). `vercel.json` rewrites routes to `index.html` so deep links like `/projects/re-genesis` work.

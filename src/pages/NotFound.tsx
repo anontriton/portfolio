@@ -8,7 +8,7 @@ export default function NotFound() {
         <span className="text-green">$</span> cd {pathname}
       </div>
       <div className="mt-2 text-red">bash: cd: {pathname}: No such file or directory</div>
-      <Link to="/" className="mt-6 inline-block text-blue hover:underline">
+      <Link viewTransition to="/" className="mt-6 inline-block text-blue hover:underline">
         cd ~
       </Link>
     </div>

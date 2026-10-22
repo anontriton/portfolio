@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/fetch-contributions.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/fetch-contributions.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

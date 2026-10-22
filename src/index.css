@@ -81,9 +81,59 @@ body {
   );
 }
 
+/* sections fade up the first time they scroll into view */
+.reveal {
+  opacity: 0;
+  translate: 0 14px;
+  transition:
+    opacity 500ms ease-out,
+    translate 500ms ease-out;
+}
+.reveal[data-shown] {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* route changes cross-fade (links opt in with viewTransition) */
+::view-transition-old(root) {
+  animation: 120ms ease-in both vt-out;
+}
+::view-transition-new(root) {
+  animation: 220ms ease-out both vt-in;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+/* "open to work" rubber stamp in the hero */
+.stamp {
+  rotate: -8deg;
+  transition: rotate 200ms ease-out, scale 200ms ease-out;
+}
+.stamp:hover {
+  rotate: -2deg;
+  scale: 1.06;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    translate: none;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
   .cursor::after {
     animation: none;
