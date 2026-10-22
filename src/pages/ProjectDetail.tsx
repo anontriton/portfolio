@@ -39,6 +39,7 @@ export default function ProjectDetail() {
               poster={p.image.src}
               aria-label={p.image.alt}
               controls
+              autoPlay={!window.matchMedia('(prefers-reduced-motion: reduce)').matches}
               muted
               loop
               playsInline
