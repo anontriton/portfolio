@@ -432,16 +432,38 @@ function Education() {
 }
 
 function Contact() {
+  const [from, setFrom] = useState('')
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
+  const [website, setWebsite] = useState('') // honeypot: hidden from people, filled by bots
+  const [status, setStatus] = useState<{ state: 'idle' | 'sending' | 'sent' } | { state: 'error'; message: string }>({ state: 'idle' })
+  const openedAt = useRef(Date.now())
 
-  function send(e: FormEvent) {
+  const mailto = `mailto:${profile.email}?${new URLSearchParams({ subject: subject || 'Hello from your portfolio', body })
+    .toString()
+    .replace(/\+/g, '%20')}`
+
+  async function send(e: FormEvent) {
     e.preventDefault()
-    const q = new URLSearchParams({ subject: subject || 'Hello from your portfolio', body })
-    window.location.href = `mailto:${profile.email}?${q.toString().replace(/\+/g, '%20')}`
+    setStatus({ state: 'sending' })
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: from, subject, message: body, website, elapsed: Date.now() - openedAt.current }),
+      })
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+      if (!res.ok || !data.ok) throw new Error(data.error || 'could not send right now')
+      setStatus({ state: 'sent' })
+      setSubject('')
+      setBody('')
+    } catch (err) {
+      setStatus({ state: 'error', message: err instanceof Error ? err.message : 'could not send right now' })
+    }
   }
 
   const row = 'flex items-center gap-3 border-b border-line px-4 py-2.5'
+  const input = 'min-w-0 flex-1 bg-transparent text-fg outline-none placeholder:text-faint'
   return (
     <Section>
       <Prompt cmd="./contact.sh" id="contact" />
@@ -451,25 +473,46 @@ function Contact() {
           <span className="truncate text-fg">{profile.email}</span>
         </div>
         <label className={row}>
+          <span className="w-[64px] shrink-0 text-amber">from:</span>
+          <input type="email" required value={from} onChange={(e) => setFrom(e.target.value)} placeholder="you@example.com" autoComplete="email" className={input} />
+        </label>
+        <label className={row}>
           <span className="w-[64px] shrink-0 text-amber">subject:</span>
-          <input
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="software engineering role at …"
-            className="min-w-0 flex-1 bg-transparent text-fg outline-none placeholder:text-faint"
-          />
+          <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="software engineering role at …" maxLength={150} className={input} />
+        </label>
+        <label className="absolute -left-[9999px]" aria-hidden>
+          website
+          <input tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
         </label>
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
+          required
           rows={5}
+          maxLength={5000}
           aria-label="Message"
           placeholder="Hi Iverson, …"
           className="block w-full resize-none bg-transparent px-4 py-3 leading-relaxed text-fg outline-none placeholder:text-faint"
         />
         <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-3">
-          <span className="text-[11.5px] text-muted">opens in your mail app</span>
-          <button type="submit" className="h-8 cursor-pointer rounded-[3px] border border-blue/50 bg-blue/10 px-4 text-[12.5px] text-blue hover:border-blue">
+          <span className="text-[11.5px] text-muted" role="status">
+            {status.state === 'sent' && <span className="text-green">sent ✓ — I&apos;ll reply to {from}</span>}
+            {status.state === 'error' && (
+              <span className="text-red">
+                {status.message} ·{' '}
+                <a href={mailto} className="underline hover:text-fg">
+                  use your mail app
+                </a>
+              </span>
+            )}
+            {status.state === 'sending' && 'sending…'}
+            {status.state === 'idle' && 'goes straight to my inbox'}
+          </span>
+          <button
+            type="submit"
+            disabled={status.state === 'sending'}
+            className="h-8 shrink-0 cursor-pointer rounded-[3px] border border-blue/50 bg-blue/10 px-4 text-[12.5px] text-blue hover:border-blue disabled:cursor-wait disabled:opacity-60"
+          >
             send ↵
           </button>
         </div>

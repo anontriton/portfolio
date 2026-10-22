@@ -34,3 +34,13 @@ Images go in `public/images/`; the resume is `public/resume.pdf`.
 ## Deploy
 
 Import the repo in Vercel (framework preset: Vite). `vercel.json` rewrites routes to `index.html` so deep links like `/projects/re-genesis` work.
+
+### Contact form
+
+The form posts to `api/contact.ts`, a Vercel Function that emails messages through [Resend](https://resend.com). Set these in Vercel → Project → Settings → Environment Variables:
+
+- `RESEND_API_KEY` — from Resend → API Keys
+- `CONTACT_TO` — where messages go; must be your Resend account's email until you verify a domain in Resend
+- `CONTACT_FROM` (optional) — sender address once a domain is verified; defaults to `onboarding@resend.dev`
+
+`npm run dev` doesn't run functions, so the form falls back to a mail-app link locally. Test real sends on a Vercel preview deployment, or with `vercel dev`.
