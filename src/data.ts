@@ -248,8 +248,8 @@ examples/mnist/   digit classifier linked against libml.a`,
       alt: 'A battle in Re: Genesis — Thomas is selected, with blue tiles showing where he can move and red tiles showing everything he could attack after moving.',
       caption: 'Selecting a unit shows its whole reach: blue for movement, red for every tile it could strike after moving.',
     },
-    // A 4.6-minute playthrough of the opening, sped up 5× and re-encoded at
-    // 720p to keep it small.
+    // The opening battle from a 4.6-minute playthrough, starting after the
+    // title and story scenes, sped up 5× and re-encoded at 720p to keep it small.
     video: '/videos/regenesis-demo.mp4',
     gallery: [
       {
