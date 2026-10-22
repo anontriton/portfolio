@@ -8,6 +8,7 @@ const filters: { key: 'all' | Project['tags'][number]; label: string }[] = [
   { key: 'systems', label: 'systems' },
   { key: 'ml', label: 'ml' },
   { key: 'games', label: 'games' },
+  { key: 'web', label: 'web' },
 ]
 
 export default function Projects() {
