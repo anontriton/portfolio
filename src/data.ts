@@ -232,7 +232,7 @@ examples/mnist/   digit classifier linked against libml.a`,
     file: 're-genesis',
     tagline: 'A tactical RPG with utility-based enemy AI, built solo in Godot 4.',
     description:
-      'A grid-based, turn-based tactics game in the tradition of Fire Emblem and Final Fantasy Tactics, and my master’s capstone at Tufts. The build is a vertical slice: one complete chapter running the full game loop, on systems designed to carry a longer campaign.',
+      'A grid-based, turn-based tactics game in the tradition of Fire Emblem and Final Fantasy Tactics, and my master’s capstone at Tufts. The build is a vertical slice: one complete chapter running the full game loop, on systems designed to carry a longer campaign. It plays in the browser on desktop, or as a download for Windows and macOS.',
     year: '2025',
     tags: ['games'],
     stack: ['Godot 4.4', 'GDScript', 'JSON', 'state machines', 'pathfinding', 'utility AI'],
@@ -241,7 +241,7 @@ examples/mnist/   digit classifier linked against libml.a`,
       { value: '~16k', label: 'lines of GDScript', detail: 'with an in-engine test suite' },
       { value: '7', label: 'playable characters', detail: 'each with a distinct role' },
       { value: '20', label: 'abilities', detail: 'plus 12 weapons' },
-      { value: 'v0.0.34', label: 'latest build', detail: 'Windows and macOS' },
+      { value: 'v0.0.34', label: 'latest build', detail: 'web, Windows, and macOS' },
     ],
     image: {
       src: '/images/regenesis/movement-and-attack-range.jpg',
@@ -249,7 +249,7 @@ examples/mnist/   digit classifier linked against libml.a`,
       caption: 'Selecting a unit shows its whole reach: blue for movement, red for every tile it could strike after moving.',
     },
     // The opening battle from a 4.6-minute playthrough, starting after the
-    // title and story scenes, sped up 5× and re-encoded at 720p to keep it small.
+    // title and story scenes, sped up 4× and re-encoded at 720p to keep it small.
     video: '/videos/regenesis-demo.mp4',
     gallery: [
       {
@@ -279,28 +279,69 @@ examples/mnist/   digit classifier linked against libml.a`,
       'Combat math with a physical/special split, damage variance, luck-scaled crits, speed-scaled accuracy, counterattacks, weapon and element triangles, and a forecast that matches what the attack actually does.',
       'A two-layer architecture separating campaign orchestration from battle logic over signals, with an async UI queue that sequences dialogue, camera, and notifications while blocking input.',
       'All content defined in JSON: 7 protagonists, 20 abilities, 12 weapons, and a scripting system that fires popups, reinforcements, camera moves, and objective changes mid-battle.',
-      'A polish pass (v0.0.34) added tile-by-tile movement, map HP bars, hit and spell effects, phase banners, and typewriter dialogue. Builds ship for Windows and macOS.',
+      'A polish pass (v0.0.34) added tile-by-tile movement, map HP bars, hit and spell effects, phase banners, and typewriter dialogue. Builds ship for the web, Windows, and macOS.',
     ],
     links: [
-      { label: 'download build', href: 'https://github.com/anontriton/regenesis-builds/releases', primary: true },
+      { label: 'live demo', href: 'https://regenesis.iversonlai.dev', primary: true },
+      { label: 'download build', href: 'https://github.com/anontriton/regenesis-builds/releases' },
       { label: 'builds repo', href: 'https://github.com/anontriton/regenesis-builds' },
     ],
     note: 'Source is private — happy to walk through the code in an interview.',
     sections: [
+      // Code samples match the "Source code" section of the regenesis-builds README.
       {
-        heading: 'enemy turn',
-        code: `for each enemy unit:
-  candidates = reachable_tiles(unit)        # terrain-weighted flood fill
-  for tile in candidates:
-    for action in [attack, heal, buff, wait]:
-      score = 0.40 * damage_potential       # expected + crit + lethal bonus
-            + 0.25 * (1 - target_hp_ratio)
-            + 0.35 * aggro(target)
-            + 0.30 * safety(tile)           # counter range, local numbers
-            + 0.15 * ally_proximity(tile)
-            + 0.05 * proximity(tile)
-            ± 0.05 noise
-  execute(best) or fall back to next-best`,
+        heading: 'movement range',
+        body: [
+          'Movement is a cost-aware flood fill over the 4-way grid. Each step adds the terrain cost for that unit (sand is cheap for one class and expensive for another), impassable tiles and enemy units block, and a tile’s cost is lowered whenever a cheaper route to it is found. The result is every tile the unit can reach, mapped to what it costs to get there. This is what paints the blue tiles.',
+        ],
+        code: `# battle/grid/grid.gd
+func flood_reachable(start: Vector2i, max_cost: int, is_occupied: Callable, terrain_costs: Dictionary = {}) -> Dictionary:
+    var open: Array[Vector2i] = [start]
+    var cost: Dictionary = { start: 0 }
+
+    while open.size() > 0:
+        var cur: Vector2i = open.pop_front()
+        var cur_cost: int = cost[cur]
+
+        for n in neighbors(cur):
+            # check if terrain is passable
+            var terrain_cost = terrain_costs.get(n, 999)
+            if terrain_cost >= 999:
+                continue
+
+            # check if obstacle blocks movement
+            if obstacle and obstacle.get_cell_source_id(n) != -1:
+                continue
+
+            # check if another unit occupies this cell (allow starting position)
+            if n != start and is_occupied.call(n):
+                continue
+
+            # calculate movement cost to reach this neighbor
+            var step: int = cur_cost + terrain_cost
+            if step > max_cost:
+                continue
+
+            # update cost if this is a new cell or we found a cheaper path
+            if not cost.has(n) or step < int(cost[n]):
+                cost[n] = step
+                open.push_back(n)
+
+    return cost`,
+      },
+      {
+        heading: 'attack range',
+        body: [
+          'Attack and ability ranges are diamonds, measured with Manhattan distance (|dx| + |dy|). The red overlay runs this from every tile in the movement result, so it shows everything a unit could hit after moving.',
+        ],
+        code: `# battle/utils/range_calculator.gd
+static func get_cells_in_range(start_cell: Vector2i, range_value: int) -> Array[Vector2i]:
+    var cells: Array[Vector2i] = []
+    for dx in range(-range_value, range_value + 1):
+        for dy in range(-range_value, range_value + 1):
+            if abs(dx) + abs(dy) <= range_value and (dx != 0 or dy != 0):
+                cells.append(start_cell + Vector2i(dx, dy))
+    return cells`,
       },
       {
         heading: 'what’s next',
