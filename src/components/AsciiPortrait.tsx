@@ -18,14 +18,14 @@ const RAMP = ':;=+*#%@'
 const COLS = 92
 const CELL = 0.79 // cell width / height; tighter than the font so rows overlap
 const INK_LINES = 0.6 // how much a cell's darkest subpixel (line work) pulls it dark
-const LOW = 0.04 // brightness percentiles that map to the ends of the ramp
-const HIGH = 0.97
+const LOW = 0.04 // brightness percentiles that map to the ends of the ramp;
+const HIGH = 0.995 // high enough that skin sits a step below the teeth
 const RADIUS = 46 // px of cursor influence
 const PUSH = 2600
 const SPRING = 90
 const DAMP = 11
 
-type Glyph = { ch: string; alpha: number; hx: number; hy: number; ox: number; oy: number; vx: number; vy: number }
+type Glyph = { ch: string; color: string; alpha: number; hx: number; hy: number; ox: number; oy: number; vx: number; vy: number }
 
 export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt: string; fallback: ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -36,6 +36,9 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
     const ctx = canvas.getContext('2d')!
     const css = getComputedStyle(document.documentElement)
     const ink = css.getPropertyValue('--color-rosewater').trim() || '#f5e0dc'
+    // the one spot of colour: the smile
+    const lipInk = css.getPropertyValue('--color-red').trim() || '#f38ba8'
+    const teethInk = '#ffffff'
     const accent = css.getPropertyValue('--color-blue').trim() || '#89b4fa'
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -90,7 +93,7 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
       // Per cell: coverage, brightness, and the silhouette outline. Brightness
       // leans on the cell's darkest subpixel so thin ink lines (eyes, brows,
       // the mouth) survive as gaps instead of averaging away.
-      type Cell = { cover: number; light: number; line: number }
+      type Cell = { cover: number; light: number; line: number; rgb: number[] }
       const cells: Cell[] = []
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -98,18 +101,22 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
           let sum = 0
           let darkest = 1
           let line = 0
+          const rgb = [0, 0, 0]
           for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
             const x = c * 2 + dx
             const y = r * 2 + dy
             const a = at(alpha, x, y)
             cover += a / 4
             sum += at(lum, x, y) * a
+            const p = (Math.min(sh - 1, y) * sw + Math.min(sw - 1, x)) * 4
+            for (let k = 0; k < 3; k++) rgb[k] += px[p + k] * a
             if (a > 0.5) darkest = Math.min(darkest, at(lum, x, y))
             // the silhouette, as an outline pen stroke
             line = Math.max(line, Math.min(1, sobel(alpha, x, y) / 1.6))
           }
           const mean = cover > 0 ? sum / (cover * 4) : 0
-          cells.push({ cover, light: (1 - INK_LINES) * mean + INK_LINES * Math.min(mean, darkest), line })
+          if (cover > 0) for (let k = 0; k < 3; k++) rgb[k] /= cover * 4
+          cells.push({ cover, light: (1 - INK_LINES) * mean + INK_LINES * Math.min(mean, darkest), line, rgb })
         }
       }
 
@@ -120,15 +127,19 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
       const hi = sorted[Math.floor(sorted.length * HIGH)] ?? 1
       const tone = (l: number) => Math.min(1, Math.max(0, (l - lo) / (hi - lo || 1)))
 
+      const mouth = findMouth(cells.map((k) => (k.cover >= 0.6 ? k.rgb : null)), COLS, rows)
+
       glyphs = []
       cells.forEach(({ cover, light, line }, i) => {
         if (cover < 0.3 && line < 0.5) return
         const c = i % COLS
         const r = Math.floor(i / COLS)
         const amount = Math.max(tone(light), line)
+        const part = mouth[i]
         glyphs.push({
-          ch: RAMP[Math.round(amount * (RAMP.length - 1))],
-          alpha: 0.45 + 0.55 * amount,
+          ch: part === TEETH ? RAMP[RAMP.length - 1] : RAMP[Math.round(amount * (RAMP.length - 1))],
+          color: part === TEETH ? teethInk : part === LIPS ? lipInk : ink,
+          alpha: part ? 1 : 0.45 + 0.55 * amount,
           hx: (c + 0.5) * cw,
           hy: (r + 0.5) * chh,
           ox: 0,
@@ -145,7 +156,7 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
       for (const g of glyphs) {
         const moved = Math.min(1, Math.hypot(g.ox, g.oy) / 10)
         ctx.globalAlpha = Math.max(g.alpha, moved)
-        ctx.fillStyle = moved > 0.15 ? accent : ink
+        ctx.fillStyle = moved > 0.15 ? accent : g.color
         ctx.fillText(g.ch, g.hx + g.ox, g.hy + g.oy)
       }
       ctx.globalAlpha = 1
@@ -260,4 +271,67 @@ function keyBackdrop(px: Uint8ClampedArray, cols: number, rows: number) {
     if (i < (rows - 1) * cols) stack.push(i + cols)
   }
   return out
+}
+
+const LIPS = 1
+const TEETH = 2
+
+// Picks out the smile by colour so it can be drawn as the portrait's one
+// accent. Lips are a redder orange than skin (hue ~10–21° vs ~27°) and a bit
+// darker; the mouth is the largest connected patch of them. Teeth are the
+// near-white cells inside that patch's box — which keeps a white collar out.
+function findMouth(rgb: (number[] | null)[], cols: number, rows: number) {
+  const out = new Uint8Array(cols * rows)
+  const hsl = rgb.map((v) => (v ? toHsl(v[0], v[1], v[2]) : null))
+  const isLip = hsl.map((v) => !!v && v[0] >= 8 && v[0] <= 21 && v[1] > 0.5 && v[2] > 0.55 && v[2] < 0.74)
+
+  // largest 4-connected patch of lip-coloured cells
+  const seen = new Uint8Array(cols * rows)
+  let best: number[] = []
+  for (let i = 0; i < isLip.length; i++) {
+    if (!isLip[i] || seen[i]) continue
+    const patch: number[] = []
+    const stack = [i]
+    seen[i] = 1
+    while (stack.length) {
+      const j = stack.pop()!
+      patch.push(j)
+      const c = j % cols
+      for (const n of [c > 0 ? j - 1 : -1, c < cols - 1 ? j + 1 : -1, j - cols, j + cols]) {
+        if (n >= 0 && n < isLip.length && isLip[n] && !seen[n]) {
+          seen[n] = 1
+          stack.push(n)
+        }
+      }
+    }
+    if (patch.length > best.length) best = patch
+  }
+  if (best.length < 4) return out
+
+  const xs = best.map((j) => j % cols)
+  const ys = best.map((j) => Math.floor(j / cols))
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  for (const j of best) out[j] = LIPS
+  for (let y = y0; y <= y1; y++) {
+    for (let x = x0; x <= x1; x++) {
+      const j = y * cols + x
+      const v = hsl[j]
+      if (v && !out[j] && v[2] > 0.8) out[j] = TEETH
+    }
+  }
+  return out
+}
+
+function toHsl(r: number, g: number, b: number): [number, number, number] {
+  r /= 255
+  g /= 255
+  b /= 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  const d = max - min
+  if (!d) return [0, 0, l]
+  const s = d / (1 - Math.abs(2 * l - 1))
+  const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4
+  return [(h * 60 + 360) % 360, s, l]
 }
