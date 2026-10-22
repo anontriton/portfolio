@@ -20,6 +20,8 @@ const CELL = 0.79 // cell width / height; tighter than the font so rows overlap
 const INK_LINES = 0.6 // how much a cell's darkest subpixel (line work) pulls it dark
 const LOW = 0.04 // brightness percentiles that map to the ends of the ramp;
 const HIGH = 0.995 // high enough that skin sits a step below the teeth
+const TINT = 0.25 // how much of the picture's own colour tints the ink
+const LIP_GLYPH = '+' // sparser than the skin around it, so lips read darker
 const RADIUS = 46 // px of cursor influence
 const PUSH = 2600
 const SPRING = 90
@@ -35,7 +37,7 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
     const canvas = canvasRef.current!
     const ctx = canvas.getContext('2d')!
     const css = getComputedStyle(document.documentElement)
-    const ink = css.getPropertyValue('--color-rosewater').trim() || '#f5e0dc'
+    const ink = hexRgb(css.getPropertyValue('--color-rosewater').trim() || '#f5e0dc')
     // the one spot of colour: the smile
     const lipInk = css.getPropertyValue('--color-red').trim() || '#f38ba8'
     const teethInk = '#ffffff'
@@ -130,15 +132,15 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
       const mouth = findMouth(cells.map((k) => (k.cover >= 0.6 ? k.rgb : null)), COLS, rows)
 
       glyphs = []
-      cells.forEach(({ cover, light, line }, i) => {
+      cells.forEach(({ cover, light, line, rgb }, i) => {
         if (cover < 0.3 && line < 0.5) return
         const c = i % COLS
         const r = Math.floor(i / COLS)
         const amount = Math.max(tone(light), line)
         const part = mouth[i]
         glyphs.push({
-          ch: part === TEETH ? RAMP[RAMP.length - 1] : RAMP[Math.round(amount * (RAMP.length - 1))],
-          color: part === TEETH ? teethInk : part === LIPS ? lipInk : ink,
+          ch: part === TEETH ? RAMP[RAMP.length - 1] : part === LIPS ? LIP_GLYPH : RAMP[Math.round(amount * (RAMP.length - 1))],
+          color: part === TEETH ? teethInk : part === LIPS ? lipInk : tint(ink, cover > 0 ? rgb : ink),
           alpha: part ? 1 : 0.45 + 0.55 * amount,
           hx: (c + 0.5) * cw,
           hy: (r + 0.5) * chh,
@@ -334,4 +336,15 @@ function toHsl(r: number, g: number, b: number): [number, number, number] {
   const s = d / (1 - Math.abs(2 * l - 1))
   const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4
   return [(h * 60 + 360) % 360, s, l]
+}
+
+// The ink colour with a little of the picture's own colour mixed in.
+function tint(ink: number[], rgb: number[]) {
+  const [r, g, b] = ink.map((v, k) => Math.round(v + (rgb[k] - v) * TINT))
+  return `rgb(${r} ${g} ${b})`
+}
+
+function hexRgb(hex: string) {
+  const n = parseInt(hex.replace('#', ''), 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
