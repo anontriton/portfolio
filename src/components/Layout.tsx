@@ -91,8 +91,8 @@ function Footer({ offMap }: { offMap: boolean }) {
             dither by @stackedlol
           </a>
         ) : (
-          <a href="https://github.com/michikusa404/ascii-kanji-sharks" target="_blank" rel="noreferrer" className="hover:text-fg">
-            sharks by @michikusa404
+          <a href="https://github.com/stackedlol/ascii-sharks" target="_blank" rel="noreferrer" className="hover:text-fg">
+            sharks by @stackedlol
           </a>
         )}
         <a href={profile.sourceRepo} target="_blank" rel="noreferrer" className="hover:text-fg">

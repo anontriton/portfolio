@@ -52,7 +52,7 @@ Post body in Markdown…
 
 ## Background
 
-The ocean behind the page is [ascii-kanji-sharks](https://github.com/michikusa404/ascii-kanji-sharks) by @michikusa404 (MIT), credited in the footer. It's vendored in [`src/vendor/ascii-kanji-sharks/`](src/vendor/ascii-kanji-sharks/) with a small site-specific `engine.js` wrapper; local changes are marked `Patched in for iversonlai.dev` and listed in that folder's README. Its opacity and the fade behind the content column are `opacity-45` in `SharkBackground.tsx` and `.shark-sea` in `src/index.css`.
+The ocean behind the page is [ascii-sharks](https://github.com/stackedlol/ascii-sharks) by @stackedlol, used with the author's public permission and credited in the footer. It's vendored in [`src/vendor/ascii-sharks/`](src/vendor/ascii-sharks/); local changes are marked `Patched in for iversonlai.dev` and listed in that folder's README. Its opacity and the fade behind the content column are `opacity-45` in `SharkBackground.tsx` and `.shark-sea` in `src/index.css`.
 
 The 404 page swaps the ocean for [stacked-dither](https://github.com/stackedlol/stacked-dither), also by @stackedlol; the footer credits it there instead of the sharks. It's vendored unchanged in [`src/vendor/stacked-dither/`](src/vendor/stacked-dither/); the Catppuccin palette and speed are in `src/components/DitherBackground.tsx`.
 
