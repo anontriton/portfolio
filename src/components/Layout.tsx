@@ -7,8 +7,14 @@ import SharkBackground from './SharkBackground'
 const TldrContext = createContext<() => void>(() => {})
 export const useTldr = () => useContext(TldrContext)
 
+// The 404 page swaps the shark ocean for the dither field; it flips this while
+// mounted so the backdrop and the footer credit follow.
+const OffMapContext = createContext<(on: boolean) => void>(() => {})
+export const useOffMap = () => useContext(OffMapContext)
+
 export default function Layout() {
   const [tldrOpen, setTldrOpen] = useState(false)
+  const [offMap, setOffMap] = useState(false)
   const { pathname } = useLocation()
 
   useEffect(() => {
@@ -17,14 +23,16 @@ export default function Layout() {
 
   return (
     <TldrContext.Provider value={() => setTldrOpen(true)}>
-      <SharkBackground />
-      <div className="scanlines" aria-hidden />
-      <Nav />
-      <main className="mx-auto w-full max-w-[860px] px-4 pb-16 sm:px-6">
-        <Outlet />
-      </main>
-      <Footer />
-      {tldrOpen && <Tldr onClose={() => setTldrOpen(false)} />}
+      <OffMapContext.Provider value={setOffMap}>
+        {!offMap && <SharkBackground />}
+        <div className="scanlines" aria-hidden />
+        <Nav />
+        <main className="mx-auto w-full max-w-[860px] px-4 pb-16 sm:px-6">
+          <Outlet />
+        </main>
+        <Footer offMap={offMap} />
+        {tldrOpen && <Tldr onClose={() => setTldrOpen(false)} />}
+      </OffMapContext.Provider>
     </TldrContext.Provider>
   )
 }
@@ -65,7 +73,7 @@ function Nav() {
   )
 }
 
-function Footer() {
+function Footer({ offMap }: { offMap: boolean }) {
   const [time, setTime] = useState(() => sdTime())
   useEffect(() => {
     const id = setInterval(() => setTime(sdTime()), 15_000)
@@ -78,19 +86,15 @@ function Footer() {
         {time} PT · {profile.location.toLowerCase()}
       </span>
       <span className="flex items-center gap-4">
-        <span>
-          <a href="https://github.com/stackedlol/ascii-sharks" target="_blank" rel="noreferrer" className="hover:text-fg">
-            sharks
-          </a>
-          {' + '}
+        {offMap ? (
           <a href="https://github.com/stackedlol/stacked-dither" target="_blank" rel="noreferrer" className="hover:text-fg">
-            dither
+            dither by @stackedlol
           </a>
-          {' by '}
-          <a href="https://github.com/stackedlol" target="_blank" rel="noreferrer" className="hover:text-fg">
-            @stackedlol
+        ) : (
+          <a href="https://github.com/stackedlol/ascii-sharks" target="_blank" rel="noreferrer" className="hover:text-fg">
+            sharks by @stackedlol
           </a>
-        </span>
+        )}
         <a href={profile.sourceRepo} target="_blank" rel="noreferrer" className="hover:text-fg">
           view source
         </a>

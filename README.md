@@ -54,7 +54,7 @@ Post body in Markdown…
 
 The ocean behind the page is [ascii-sharks](https://github.com/stackedlol/ascii-sharks) by @stackedlol, used with the author's public permission and credited in the footer. It's vendored in [`src/vendor/ascii-sharks/`](src/vendor/ascii-sharks/); local changes are marked `Patched in for iversonlai.dev` and listed in that folder's README. Its opacity and the fade behind the content column are `opacity-45` in `SharkBackground.tsx` and `.shark-sea` in `src/index.css`.
 
-The animated page headers on the blog and projects pages (and each post and project) are [stacked-dither](https://github.com/stackedlol/stacked-dither), also by @stackedlol and credited in the footer. It's vendored unchanged in [`src/vendor/stacked-dither/`](src/vendor/stacked-dither/); the Catppuccin palette, speed and quiet-well depth are in `src/components/DitherBanner.tsx`.
+The 404 page swaps the ocean for [stacked-dither](https://github.com/stackedlol/stacked-dither), also by @stackedlol; the footer credits it there instead of the sharks. It's vendored unchanged in [`src/vendor/stacked-dither/`](src/vendor/stacked-dither/); the Catppuccin palette and speed are in `src/components/DitherBackground.tsx`.
 
 ## Deploy
 

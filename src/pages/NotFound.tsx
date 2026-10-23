@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { posts } from '../blog'
+import DitherBackground from '../components/DitherBackground'
+import { useOffMap } from '../components/Layout'
 import { profile, projects } from '../data'
 
 // A tiny fake shell. Input never leaves this component: it's matched against
@@ -22,6 +24,12 @@ export default function NotFound() {
   const guess = closest(pathname)
 
   // Focus on desktop only; on phones it would throw up the keyboard unasked.
+  const setOffMap = useOffMap()
+  useEffect(() => {
+    setOffMap(true)
+    return () => setOffMap(false)
+  }, [setOffMap])
+
   useEffect(() => {
     if (window.matchMedia('(pointer: fine)').matches) field.current?.focus({ preventScroll: true })
   }, [])
@@ -93,55 +101,58 @@ export default function NotFound() {
   }
 
   return (
-    <div className="pt-16 text-[13.5px]" onClick={() => window.getSelection()?.isCollapsed && field.current?.focus({ preventScroll: true })}>
-      <div className="text-muted">
-        <span className="text-green">$</span> cd {pathname}
-      </div>
-      <div className="mt-2 text-red">bash: cd: {pathname}: No such file or directory</div>
-      {guess && (
-        <div className="mt-2 text-muted">
-          did you mean{' '}
-          <Link viewTransition to={guess} className="text-blue hover:underline">
-            cd {guess}
-          </Link>
-          ?
+    <div className="pt-16" onClick={() => window.getSelection()?.isCollapsed && field.current?.focus({ preventScroll: true })}>
+      <DitherBackground />
+      <div className="rounded-[4px] border border-line-strong bg-bg/85 p-5 text-[13.5px] backdrop-blur-sm sm:p-6">
+        <div className="text-muted">
+          <span className="text-green">$</span> cd {pathname}
         </div>
-      )}
-      <div className="mt-2 text-muted">
-        type <span className="text-fg-dim">help</span> for commands, or{' '}
-        <Link viewTransition to="/" className="text-blue hover:underline">
-          cd ~
-        </Link>{' '}
-        to go home.
-      </div>
-
-      <div className="mt-6 space-y-2" aria-live="polite">
-        {lines.map((l, i) => (
-          <div key={i}>
-            <div className="text-muted">
-              <span className="text-green">$</span> <span className="text-fg-dim">{l.cmd}</span>
-            </div>
-            {l.out && <div className="mt-1 break-words">{l.out}</div>}
+        <div className="mt-2 text-red">bash: cd: {pathname}: No such file or directory</div>
+        {guess && (
+          <div className="mt-2 text-muted">
+            did you mean{' '}
+            <Link viewTransition to={guess} className="text-blue hover:underline">
+              cd {guess}
+            </Link>
+            ?
           </div>
-        ))}
-      </div>
+        )}
+        <div className="mt-2 text-muted">
+          type <span className="text-fg-dim">help</span> for commands, or{' '}
+          <Link viewTransition to="/" className="text-blue hover:underline">
+            cd ~
+          </Link>{' '}
+          to go home.
+        </div>
 
-      <label className="mt-2 flex items-center gap-2 text-muted">
-        <span className="text-green">$</span>
-        <input
-          ref={field}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={onKey}
-          maxLength={120}
-          aria-label="Terminal command, type help for a list"
-          autoComplete="off"
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck={false}
-          className="term-input min-w-0 flex-1 bg-transparent text-fg caret-blue"
-        />
-      </label>
+        <div className="mt-6 space-y-2" aria-live="polite">
+          {lines.map((l, i) => (
+            <div key={i}>
+              <div className="text-muted">
+                <span className="text-green">$</span> <span className="text-fg-dim">{l.cmd}</span>
+              </div>
+              {l.out && <div className="mt-1 break-words">{l.out}</div>}
+            </div>
+          ))}
+        </div>
+
+        <label className="mt-2 flex items-center gap-2 text-muted">
+          <span className="text-green">$</span>
+          <input
+            ref={field}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={onKey}
+            maxLength={120}
+            aria-label="Terminal command, type help for a list"
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            className="term-input min-w-0 flex-1 bg-transparent text-fg caret-blue"
+          />
+        </label>
+      </div>
     </div>
   )
 }

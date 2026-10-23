@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { projects, profile, type Project } from '../data'
-import DitherBanner from '../components/DitherBanner'
 import ProjectCard from '../components/ProjectCard'
 import { Prompt } from '../components/ui'
 
@@ -18,21 +17,19 @@ export default function Projects() {
 
   return (
     <div className="pt-10 sm:pt-14">
-      <DitherBanner seed={42}>
-        <Prompt
-          cmd="ls"
-          arg={`projects/${filter === 'all' ? '' : `--tag=${filter}`}`}
-          right={
-            <a href={profile.github} target="_blank" rel="noreferrer" className="text-[12px] text-muted hover:text-blue">
-              github →
-            </a>
-          }
-        />
-        <h1 className="text-[28px] font-bold text-fg">projects</h1>
-        <p className="mt-2 max-w-[600px] text-[13.5px] leading-relaxed text-muted">
-          Systems rebuilt from first principles, then pushed on for performance and correctness.
-        </p>
-      </DitherBanner>
+      <Prompt
+        cmd="ls"
+        arg={`projects/${filter === 'all' ? '' : `--tag=${filter}`}`}
+        right={
+          <a href={profile.github} target="_blank" rel="noreferrer" className="text-[12px] text-muted hover:text-blue">
+            github →
+          </a>
+        }
+      />
+      <h1 className="text-[28px] font-bold text-fg">projects</h1>
+      <p className="mt-2 max-w-[600px] text-[13.5px] leading-relaxed text-muted">
+        Systems rebuilt from first principles, then pushed on for performance and correctness.
+      </p>
 
       <div className="mt-6 flex gap-1 text-[12.5px]" role="tablist">
         {filters.map((f, i) => (
