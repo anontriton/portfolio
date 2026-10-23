@@ -68,9 +68,10 @@ body {
   content: '';
   display: inline-block;
   width: 0.42em;
-  height: 0.82em;
+  /* JetBrains Mono's cap height, sitting on the baseline */
+  height: 0.73em;
   margin-left: 0.18em;
-  vertical-align: -0.04em;
+  vertical-align: baseline;
   background: var(--color-blue);
   animation: blink 1.1s steps(1) infinite;
 }
