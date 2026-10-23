@@ -29,7 +29,7 @@ export default function DitherBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-[5] h-dvh w-screen">
       <div ref={ref} className="absolute inset-0" />
-      <div className="absolute inset-0 bg-bg/45" />
+      <div className="absolute inset-0 bg-bg/60" />
     </div>
   )
 }
