@@ -103,13 +103,9 @@ function Hero() {
       >
         open to work
       </a>
-      <div className="text-[13px] text-muted">
-        <span className="text-purple">{profile.handle}</span>
-        <span className="text-muted">@</span>
-        <span className="text-blue">{profile.host}</span>:<span className="text-teal">~</span>$ neofetch
-      </div>
+      <Prompt cmd="neofetch" />
 
-      <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-9">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-9">
         {profile.portrait ? (
           <div className="w-[220px] shrink-0 sm:w-[var(--portrait)]" style={{ '--portrait': `${infoHeight ?? 300}px` } as CSSProperties}>
             <AsciiPortrait src={profile.portrait} alt={`ASCII portrait of ${profile.name}`} fallback={logo} />
