@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
+import { useScramble, useSeen } from './motion'
 
 const accents = ['text-blue', 'text-green', 'text-pink', 'text-amber', 'text-purple', 'text-teal', 'text-orange', 'text-lavender', 'text-red', 'text-cyan']
 
@@ -7,13 +8,20 @@ export function accentFor(i: number) {
   return accents[i % accents.length]
 }
 
-// "$ cat experience.log" style section header
+// "$ cat experience.log" style section header; the command decodes from
+// noise the first time it scrolls into view.
 export function Prompt({ cmd, arg, right, id }: { cmd: string; arg?: string; right?: ReactNode; id?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const line = arg ? `${cmd} ${arg}` : cmd
+  const shown = useScramble(line, useSeen(ref))
   return (
-    <div id={id} className="mb-5 flex scroll-mt-20 items-baseline justify-between gap-4 text-[13px]">
+    <div ref={ref} id={id} className="mb-5 flex scroll-mt-20 items-baseline justify-between gap-4 text-[13px]">
       <h2 className="font-normal text-muted">
-        <span className="text-green">$</span> <span className="text-fg-dim">{cmd}</span>
-        {arg && <span className="text-blue"> {arg}</span>}
+        <span className="sr-only">{line}</span>
+        <span aria-hidden>
+          <span className="text-green">$</span> <span className="text-fg-dim">{shown.slice(0, cmd.length)}</span>
+          {arg && <span className="text-blue">{shown.slice(cmd.length)}</span>}
+        </span>
       </h2>
       {right}
     </div>

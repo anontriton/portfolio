@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import type { Project } from '../data'
+import { Ticker } from './motion'
 import { LiveBadge, Tag, accentFor } from './ui'
 
 export default function ProjectCard({ project: p, wide }: { project: Project; wide?: boolean }) {
@@ -43,7 +44,9 @@ export default function ProjectCard({ project: p, wide }: { project: Project; wi
           <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
             {p.stats.map((s, i) => (
               <div key={s.label}>
-                <span className={`text-[18px] font-bold ${accentFor(i + 1)}`}>{s.value}</span>
+                <span className={`text-[18px] font-bold ${accentFor(i + 1)}`}>
+                  <Ticker value={s.value} />
+                </span>
                 <span className="ml-2 text-[12px] text-muted">{s.label}</span>
               </div>
             ))}

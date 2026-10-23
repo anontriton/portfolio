@@ -1,8 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { profile, projects } from '../data'
 import { IconFile, IconGithub, IconLinkedin, IconMail } from './ui'
+import CommandPalette, { modKey } from './CommandPalette'
 import SharkBackground from './SharkBackground'
+import { ToastProvider } from './Toasts'
 
 const TldrContext = createContext<() => void>(() => {})
 export const useTldr = () => useContext(TldrContext)
@@ -15,29 +17,48 @@ export const useOffMap = () => useContext(OffMapContext)
 export default function Layout() {
   const [tldrOpen, setTldrOpen] = useState(false)
   const [offMap, setOffMap] = useState(false)
-  const { pathname } = useLocation()
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const { pathname, hash } = useLocation()
+  const openTldr = useCallback(() => setTldrOpen(true), [])
+
+  // new page: back to the top, or to the anchor when the link names one
+  useEffect(() => {
+    const target = hash && document.getElementById(hash.slice(1))
+    if (target) target.scrollIntoView()
+    else window.scrollTo(0, 0)
+  }, [pathname, hash])
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen((o) => !o)
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
 
   return (
-    <TldrContext.Provider value={() => setTldrOpen(true)}>
-      <OffMapContext.Provider value={setOffMap}>
-        {!offMap && <SharkBackground />}
-        <div className="scanlines" aria-hidden />
-        <Nav />
-        <main className="mx-auto w-full max-w-[860px] px-4 pb-16 sm:px-6">
-          <Outlet />
-        </main>
-        <Footer offMap={offMap} />
-        {tldrOpen && <Tldr onClose={() => setTldrOpen(false)} />}
-      </OffMapContext.Provider>
-    </TldrContext.Provider>
+    <ToastProvider>
+      <TldrContext.Provider value={openTldr}>
+        <OffMapContext.Provider value={setOffMap}>
+          {!offMap && <SharkBackground />}
+          <div className="scanlines" aria-hidden />
+          <Nav onPalette={() => setPaletteOpen(true)} />
+          <main className="mx-auto w-full max-w-[860px] px-4 pb-16 sm:px-6">
+            <Outlet />
+          </main>
+          <Footer offMap={offMap} />
+          {tldrOpen && <Tldr onClose={() => setTldrOpen(false)} />}
+          {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} onTldr={openTldr} />}
+        </OffMapContext.Provider>
+      </TldrContext.Provider>
+    </ToastProvider>
   )
 }
 
-function Nav() {
+function Nav({ onPalette }: { onPalette: () => void }) {
   const { pathname } = useLocation()
   const path = pathname === '/' ? '~' : '~' + pathname.replace(/\/$/, '')
   const link = ({ isActive }: { isActive: boolean }) =>
@@ -46,11 +67,33 @@ function Nav() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
       <nav className="mx-auto flex h-12 max-w-[860px] items-center justify-between gap-4 px-4 text-[13px] sm:px-6">
-        <NavLink viewTransition to="/" className="min-w-0 truncate text-fg hover:text-blue">
-          <span className="text-purple">{profile.handle}</span>
-          <span className="hidden text-muted sm:inline">:</span>
-          <span className="hidden text-blue sm:inline">{path}</span>
-        </NavLink>
+        {/* the handle goes home; the rest of the prompt is the search (or ⌘K) */}
+        <div className="flex min-w-0 items-center">
+          <NavLink
+            viewTransition
+            to="/"
+            className="shrink-0 text-purple decoration-purple/50 underline-offset-4 hover:underline"
+          >
+            {profile.handle}
+          </NavLink>
+          <button
+            type="button"
+            onClick={onPalette}
+            aria-label={`Search the site (${modKey.trim()}K)`}
+            // padded past the text so the bare "$" on phones is still a fair tap target
+            className="group -my-2 flex min-w-11 cursor-pointer items-center py-2 pr-3 sm:min-w-0"
+          >
+            <span className="truncate">
+              <span className="hidden text-muted sm:inline">:</span>
+              <span className="hidden text-blue sm:inline">{path}</span>
+              <span className="text-muted">$</span>
+            </span>
+            <span className="cursor cursor-idle" aria-hidden />
+            <span className="ml-3 hidden text-[11px] text-faint opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 sm:inline">
+              search {modKey}K
+            </span>
+          </button>
+        </div>
         <div className="flex shrink-0 items-center gap-4 sm:gap-5">
           <NavLink viewTransition to="/projects" className={link}>
             projects

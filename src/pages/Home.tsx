@@ -5,6 +5,8 @@ import { useTldr } from '../components/Layout'
 import ProjectCard from '../components/ProjectCard'
 import ActivityGraph from '../components/ActivityGraph'
 import AsciiPortrait from '../components/AsciiPortrait'
+import { Ticker } from '../components/motion'
+import { useToast } from '../components/Toasts'
 import {
   ActionButton,
   Button,
@@ -206,7 +208,9 @@ function Flagship() {
               key={s.label}
               className={`border-line p-4 sm:p-5 ${i % 2 === 0 ? 'border-r' : ''} ${i < 2 ? 'border-b sm:border-b-0' : ''} ${i === 1 ? 'sm:border-r' : ''}`}
             >
-              <div className={`text-[24px] font-bold leading-none sm:text-[26px] ${accentFor(i + 1)}`}>{s.value}</div>
+              <div className={`text-[24px] font-bold leading-none sm:text-[26px] ${accentFor(i + 1)}`}>
+                <Ticker value={s.value} />
+              </div>
               <div className="mt-2 text-[12px] text-fg-dim">{s.label}</div>
               <div className="mt-1 text-[11px] leading-snug text-muted">{s.detail}</div>
             </div>
@@ -448,6 +452,7 @@ function Contact() {
   const [website, setWebsite] = useState('') // honeypot: hidden from people, filled by bots
   const [status, setStatus] = useState<{ state: 'idle' | 'sending' | 'sent' } | { state: 'error'; message: string }>({ state: 'idle' })
   const openedAt = useRef(Date.now())
+  const toast = useToast()
 
   const mailto = `mailto:${profile.email}?${new URLSearchParams({ subject: subject || 'Hello from your portfolio', body })
     .toString()
@@ -465,6 +470,7 @@ function Contact() {
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
       if (!res.ok || !data.ok) throw new Error(data.error || 'could not send right now')
       setStatus({ state: 'sent' })
+      toast({ tone: 'ok', text: 'message sent', detail: `I'll reply to ${from}` })
       setSubject('')
       setBody('')
     } catch (err) {

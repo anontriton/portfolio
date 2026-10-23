@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { projects } from '../data'
 import { Button, IconPlay, Prompt, Section, Tag, accentFor } from '../components/ui'
+import { Ticker } from '../components/motion'
 import NotFound from './NotFound'
 
 // One column per stat on desktop, so three stats fill the row like four do.
@@ -61,7 +62,9 @@ export default function ProjectDetail() {
           {p.stats.map((s, i, all) => (
             // an odd one out spans the row on phones instead of leaving a gap
             <div key={s.label} className={`bg-surface p-4 ${all.length % 2 && i === all.length - 1 ? 'col-span-2 sm:col-span-1' : ''}`}>
-              <div className={`text-[22px] font-bold leading-none ${accentFor(i + 1)}`}>{s.value}</div>
+              <div className={`text-[22px] font-bold leading-none ${accentFor(i + 1)}`}>
+                <Ticker value={s.value} />
+              </div>
               <div className="mt-2 text-[12px] text-fg-dim">{s.label}</div>
               {s.detail && <div className="mt-1 text-[11px] text-muted">{s.detail}</div>}
             </div>
