@@ -242,7 +242,7 @@ function Activity() {
   )
 }
 
-const jobDot: Record<string, string> = { engineering: 'bg-blue', research: 'bg-green', other: 'bg-orange' }
+const jobDot: Record<string, string> = { engineering: 'bg-blue', research: 'bg-teal', other: 'bg-orange' }
 
 function Experience() {
   const main = experience.filter((j) => j.kind !== 'other')
