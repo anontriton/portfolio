@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import DitherBanner, { seedFrom } from '../components/DitherBanner'
 import { projects } from '../data'
 import { Button, IconPlay, Prompt, Section, Tag, accentFor } from '../components/ui'
 import NotFound from './NotFound'
@@ -16,11 +17,15 @@ export default function ProjectDetail() {
         ← cd ..
       </Link>
 
-      <div className="mt-6 text-[12px] text-muted">
-        ~/{p.file} · {p.year}
+      <div className="mt-6">
+        <DitherBanner seed={seedFrom(p.slug)}>
+          <div className="text-[12px] text-muted">
+            ~/{p.file} · {p.year}
+          </div>
+          <h1 className="mt-2 text-[30px] font-bold leading-tight text-fg sm:text-[36px]">{p.name}</h1>
+          <p className="mt-4 text-[14.5px] leading-relaxed text-fg-dim">{p.description}</p>
+        </DitherBanner>
       </div>
-      <h1 className="mt-2 text-[30px] font-bold leading-tight text-fg sm:text-[36px]">{p.name}</h1>
-      <p className="mt-4 text-[14.5px] leading-relaxed text-fg-dim">{p.description}</p>
 
       <div className="mt-6 flex flex-wrap gap-2">
         {p.links.map((l) => (

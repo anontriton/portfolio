@@ -78,9 +78,19 @@ function Footer() {
         {time} PT · {profile.location.toLowerCase()}
       </span>
       <span className="flex items-center gap-4">
-        <a href="https://github.com/stackedlol/ascii-sharks" target="_blank" rel="noreferrer" className="hover:text-fg">
-          sharks by @stackedlol
-        </a>
+        <span>
+          <a href="https://github.com/stackedlol/ascii-sharks" target="_blank" rel="noreferrer" className="hover:text-fg">
+            sharks
+          </a>
+          {' + '}
+          <a href="https://github.com/stackedlol/stacked-dither" target="_blank" rel="noreferrer" className="hover:text-fg">
+            dither
+          </a>
+          {' by '}
+          <a href="https://github.com/stackedlol" target="_blank" rel="noreferrer" className="hover:text-fg">
+            @stackedlol
+          </a>
+        </span>
         <a href={profile.sourceRepo} target="_blank" rel="noreferrer" className="hover:text-fg">
           view source
         </a>

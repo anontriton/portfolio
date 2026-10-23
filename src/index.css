@@ -58,6 +58,11 @@ body {
   outline-offset: 2px;
 }
 
+/* the 404 shell's prompt is its own focus indicator (the caret) */
+.term-input:focus-visible {
+  outline: none;
+}
+
 /* blinking block cursor */
 .cursor::after {
   content: '';

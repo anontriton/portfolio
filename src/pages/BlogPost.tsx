@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { formatDate, posts } from '../blog'
+import DitherBanner, { seedFrom } from '../components/DitherBanner'
 import { Prompt, Tag, accentFor } from '../components/ui'
 import NotFound from './NotFound'
 
@@ -25,24 +26,26 @@ export default function BlogPost() {
         ← cd ..
       </Link>
       <div className="mt-6">
-        <Prompt cmd="cat" arg={`blog/${post.slug}.md`} />
+        <DitherBanner seed={seedFrom(post.slug)}>
+          <Prompt cmd="cat" arg={`blog/${post.slug}.md`} />
+          <h1 className="text-[28px] font-bold leading-tight text-fg sm:text-[34px]">{post.title}</h1>
+          <div className="mt-3 flex flex-wrap items-baseline gap-x-3 text-[12.5px] text-muted">
+            <span>{formatDate(post.date)}</span>
+            <span className="text-faint">·</span>
+            <span>{post.readTime}</span>
+            {post.draft && <span className="text-orange">draft — only visible in dev</span>}
+          </div>
+          {post.tags.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {post.tags.map((t, i) => (
+                <Tag key={t} color={accentFor(i)}>
+                  {t}
+                </Tag>
+              ))}
+            </div>
+          )}
+        </DitherBanner>
       </div>
-      <h1 className="text-[28px] font-bold leading-tight text-fg sm:text-[34px]">{post.title}</h1>
-      <div className="mt-3 flex flex-wrap items-baseline gap-x-3 text-[12.5px] text-muted">
-        <span>{formatDate(post.date)}</span>
-        <span className="text-faint">·</span>
-        <span>{post.readTime}</span>
-        {post.draft && <span className="text-orange">draft — only visible in dev</span>}
-      </div>
-      {post.tags.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {post.tags.map((t, i) => (
-            <Tag key={t} color={accentFor(i)}>
-              {t}
-            </Tag>
-          ))}
-        </div>
-      )}
 
       <div className="post mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
 

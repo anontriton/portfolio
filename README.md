@@ -54,6 +54,8 @@ Post body in Markdown…
 
 The ocean behind the page is [ascii-sharks](https://github.com/stackedlol/ascii-sharks) by @stackedlol, used with the author's public permission and credited in the footer. It's vendored in [`src/vendor/ascii-sharks/`](src/vendor/ascii-sharks/); local changes are marked `Patched in for iversonlai.dev` and listed in that folder's README. Its opacity and the fade behind the content column are `opacity-45` in `SharkBackground.tsx` and `.shark-sea` in `src/index.css`.
 
+The animated page headers on the blog and projects pages (and each post and project) are [stacked-dither](https://github.com/stackedlol/stacked-dither), also by @stackedlol and credited in the footer. It's vendored unchanged in [`src/vendor/stacked-dither/`](src/vendor/stacked-dither/); the Catppuccin palette, speed and quiet-well depth are in `src/components/DitherBanner.tsx`.
+
 ## Deploy
 
 Import the repo in Vercel (framework preset: Vite). `vercel.json` rewrites routes to `index.html` so deep links like `/projects/re-genesis` work; `/api/` and `/_vercel/` are excluded so the contact function and analytics endpoints are reachable.

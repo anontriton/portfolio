@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom'
 import { formatDate, posts } from '../blog'
+import DitherBanner from '../components/DitherBanner'
 import { Prompt, Tag, accentFor } from '../components/ui'
 
 // Lists the Markdown posts in src/posts/ (see src/blog.ts), newest first.
 export default function Blog() {
   return (
     <div className="pt-10 sm:pt-14">
-      <Prompt cmd="ls" arg="-lt blog/" />
-      <h1 className="text-[28px] font-bold text-fg">blog</h1>
+      <DitherBanner>
+        <Prompt cmd="ls" arg="-lt blog/" />
+        <h1 className="text-[28px] font-bold text-fg">blog</h1>
+      </DitherBanner>
 
       {posts.length === 0 ? (
         <div className="mt-8 rounded-[4px] border border-dashed border-line-strong bg-surface px-5 py-10 text-center text-[13px] text-muted">
