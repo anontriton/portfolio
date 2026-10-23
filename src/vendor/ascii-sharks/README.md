@@ -14,6 +14,11 @@ Local changes (marked "Patched in for iversonlai.dev" in the source):
   site's theme instead of pure black.
 - `engine.ts` — reads the canvas's CSS `background-color` and passes it to the
   renderer.
+- `renderer.ts` — sharks are drawn in kanji instead of ASCII: a skin ramp
+  ordered by stroke count, and the parts named by their kanji (鰭 fin, 尾 tail,
+  鰓 gills, 目 eye, 斑/縞 markings, the odd 鮫). Drawn in the system's CJK font.
+  Inspired by https://github.com/michikusa404/ascii-kanji-sharks; the water,
+  fish and simulation are unchanged.
 
 Everything else is unchanged. `react.tsx` and the demo were not copied; the site
 uses its own wrapper in `src/components/SharkBackground.tsx`.

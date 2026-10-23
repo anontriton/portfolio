@@ -27,11 +27,20 @@ const ACCENTS = ["#e0892c", "#e03a32", "#b44ae0", "#33c8cc", "#3cb54a", "#3150e8
 
 // Sparse glyphs on bright skin, dense glyphs in shadow, so the texture
 // reinforces the shading instead of fighting it.
-const SKIN_RAMP = ":;t%SX8#@";
-const FIN_GLYPHS = "%;tS:";
-const RIDGE_GLYPHS = "@8%";
-const EDGE_HEAVY = ":;";
-const EDGE_LIGHT = ".',`";
+// Patched in for iversonlai.dev: kanji instead of ASCII, ordered by stroke
+// count, with the parts named by the kanji for them (鰭 fin, 尾 tail, 鰓 gills,
+// 目 eye, 斑/縞 spots and stripes) and the odd 鮫 (shark) on the back.
+const SKIN_RAMP = "丶一二小水汐波海潮鱗";
+const FIN_GLYPHS = "鰭";
+const RIDGE_GLYPHS = "鰭";
+const TAIL_GLYPH = "尾";
+const GILL_GLYPH = "鰓";
+const EYE_GLYPH = "目";
+const NAME_GLYPH = "鮫";
+const EDGE_HEAVY = "ノ丿";
+const EDGE_LIGHT = "丶、";
+/** System CJK faces, so the kanji need no web font download. */
+const KANJI_FONT = '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans CJK JP", "Noto Sans JP", sans-serif';
 
 
 const FLAG_BODY = 1;
@@ -41,7 +50,10 @@ const FLAG_RIDGE = 4;
 const FLAG_EYE = 5;
 /** Dark skin markings: tiger bars, zebra-shark spots. */
 const FLAG_MARK = 6;
-const MARK_GLYPHS = "#%@";
+const MARK_GLYPHS = "斑縞";
+// Patched in for iversonlai.dev: tail and gill cells get their own kanji.
+const FLAG_TAIL = 7;
+const FLAG_GILL = 8;
 
 // Sub-cell sample offsets for anti-aliased silhouettes.
 const SUBSAMPLES = [0.25, 0.3, 0.75, 0.3, 0.25, 0.72, 0.75, 0.72];
@@ -580,7 +592,10 @@ export class AsciiRenderer {
         shade = 0;
       } else if (s > shape.gills[0] && s < shape.gills[1] && across > 0.58) {
         // Five gill slits.
-        if (Math.floor(((s - shape.gills[0]) / (shape.gills[1] - shape.gills[0])) * 5) % 2 === 0) shade *= 0.45;
+        if (Math.floor(((s - shape.gills[0]) / (shape.gills[1] - shape.gills[0])) * 5) % 2 === 0) {
+          shade *= 0.45;
+          flag = FLAG_GILL;
+        }
       } else if (s < 0.05) {
         // Pale snout tip.
         shade = Math.max(shade, 0.7);
@@ -607,12 +622,14 @@ export class AsciiRenderer {
       return true;
     }
     const [v0, v1, v2, vr] = shape.pelvic;
-    if (
-      inTriangle(u, a, L * v0, 0, L * v1, 0, L * v2, L * vr) ||
-      // Forked caudal fin.
-      (shape.caudal > 0 && inTriangle(u, a, L * 0.86, 0, L * 0.95, 0, L, L * shape.caudal))
-    ) {
+    if (inTriangle(u, a, L * v0, 0, L * v1, 0, L * v2, L * vr)) {
       this.hitFlag = FLAG_FIN;
+      this.hitShade = 0.36;
+      return true;
+    }
+    // Forked caudal fin.
+    if (shape.caudal > 0 && inTriangle(u, a, L * 0.86, 0, L * 0.95, 0, L, L * shape.caudal)) {
+      this.hitFlag = FLAG_TAIL;
       this.hitShade = 0.36;
       return true;
     }
@@ -756,6 +773,8 @@ export class AsciiRenderer {
   private drawSharks(t: number) {
     const { ctx, cols, rows, cw, ch, sharkFlag, sharkShade, sharkKey, sharkDepth, sharkKind } = this;
     const n = cols * rows;
+    // Kanji are square, so size them to the cell's width rather than its height.
+    ctx.font = `600 ${Math.round(cw * 0.96)}px ${KANJI_FONT}`;
     for (let i = 0; i < n; i++) {
       const flag = sharkFlag[i];
       if (!flag) continue;
@@ -791,17 +810,22 @@ export class AsciiRenderer {
         glyph = RIDGE_GLYPHS[(key >>> 8) % RIDGE_GLYPHS.length];
       } else if (flag === FLAG_EYE) {
         level = 12;
-        glyph = "o";
+        glyph = EYE_GLYPH;
       } else if (flag === FLAG_MARK) {
         level = 24 + shade * 22;
         glyph = MARK_GLYPHS[(key >>> 8) % MARK_GLYPHS.length];
-      } else if (flag === FLAG_FIN) {
+      } else if (flag === FLAG_FIN || flag === FLAG_TAIL) {
         level = 40 + shade * 120;
-        glyph = FIN_GLYPHS[(key >>> 8) % FIN_GLYPHS.length];
+        glyph = flag === FLAG_TAIL ? TAIL_GLYPH : FIN_GLYPHS[(key >>> 8) % FIN_GLYPHS.length];
+      } else if (flag === FLAG_GILL) {
+        level = 46 + shade * 160;
+        glyph = GILL_GLYPH;
       } else {
         level = 46 + shade * 160;
         const jitter = ((key >>> 4) % 3) - 1;
-        glyph = SKIN_RAMP[clamp(Math.floor((1 - shade) * 8.99) + jitter, 0, SKIN_RAMP.length - 1)];
+        const last = SKIN_RAMP.length - 1;
+        glyph = SKIN_RAMP[clamp(Math.floor((1 - shade) * (last + 0.99)) + jitter, 0, last)];
+        if (shade < 0.4 && (key >>> 12) % 29 === 0) glyph = NAME_GLYPH;
       }
       level *= dim;
       // Tinted per species; the classic tint is a cool blue-grey, like a back seen through deep water.
