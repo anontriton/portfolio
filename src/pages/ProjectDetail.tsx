@@ -4,6 +4,9 @@ import { projects } from '../data'
 import { Button, IconPlay, Prompt, Section, Tag, accentFor } from '../components/ui'
 import NotFound from './NotFound'
 
+// One column per stat on desktop, so three stats fill the row like four do.
+const statCols: Record<number, string> = { 1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-4' }
+
 export default function ProjectDetail() {
   const { slug } = useParams()
   const idx = projects.findIndex((p) => p.slug === slug)
@@ -59,9 +62,10 @@ export default function ProjectDetail() {
       )}
 
       {p.stats && (
-        <div className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-[4px] border border-line bg-line sm:grid-cols-4">
-          {p.stats.map((s, i) => (
-            <div key={s.label} className="bg-surface p-4">
+        <div className={`mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-[4px] border border-line bg-line ${statCols[p.stats.length] ?? 'sm:grid-cols-4'}`}>
+          {p.stats.map((s, i, all) => (
+            // an odd one out spans the row on phones instead of leaving a gap
+            <div key={s.label} className={`bg-surface p-4 ${all.length % 2 && i === all.length - 1 ? 'col-span-2 sm:col-span-1' : ''}`}>
               <div className={`text-[22px] font-bold leading-none ${accentFor(i + 1)}`}>{s.value}</div>
               <div className="mt-2 text-[12px] text-fg-dim">{s.label}</div>
               {s.detail && <div className="mt-1 text-[11px] text-muted">{s.detail}</div>}
