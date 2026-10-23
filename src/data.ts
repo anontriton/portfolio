@@ -484,7 +484,7 @@ export const experience: Job[] = [
   },
   {
     role: 'Clinical Development Intern',
-    org: 'Truvian Sciences',
+    org: 'Truvian Health',
     place: 'San Diego, CA',
     dates: 'Jun 2024 – Sep 2024',
     kind: 'research',
