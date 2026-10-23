@@ -9,7 +9,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 //   2. outline — a Sobel edge on the alpha mask, drawn on top like a pen
 //   3. glyphs — rows sit closer than the font is tall, so strokes overlap
 //      into a dense, drawn texture
-// Each glyph sits on a spring; the cursor pushes glyphs away and they settle.
+// The cursor swirls glyphs out of its way — pushed outward and sideways at
+// once — and each eases home at its own pace, so the picture reforms unevenly.
+// On load the glyphs fly in from scattered spots the same way.
 
 // Ordered from lightest to heaviest. Short on purpose: a flat cartoon colour
 // lands on one glyph and reads as an even texture, so features stand out.
@@ -22,12 +24,14 @@ const LOW = 0.04 // brightness percentiles that map to the ends of the ramp;
 const HIGH = 0.995 // high enough that skin sits a step below the teeth
 const TINT = 0.25 // how much of the picture's own colour tints the ink
 const LIP_GLYPH = '+' // same colour as skin but sparser, so lips read a shade darker
-const RADIUS = 46 // px of cursor influence
-const PUSH = 2600
-const SPRING = 90
-const DAMP = 11
+const RADIUS = 11.5 // cells of cursor influence
+const RADIUS_TOUCH = 15.5 // a fingertip covers more than a pointer
+const SWIRL = 1.5 // sideways push relative to the outward push
+const DENSITY = [5, 20] // per-glyph: how hard it's pushed and how many frames it takes to ease home
+const PUSH = 0.21 // cells moved per frame per unit of density at full push
+const SCATTER = [0.3, 1] // how far past its home a glyph starts the intro, in portrait widths
 
-type Glyph = { ch: string; color: string; alpha: number; hx: number; hy: number; ox: number; oy: number; vx: number; vy: number }
+type Glyph = { ch: string; color: string; alpha: number; hx: number; hy: number; ox: number; oy: number; density: number }
 
 export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt: string; fallback: ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -40,7 +44,6 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
     const ink = hexRgb(css.getPropertyValue('--color-rosewater').trim() || '#f5e0dc')
     // teeth are the brightest thing on the face
     const teethInk = '#ffffff'
-    const accent = css.getPropertyValue('--color-blue').trim() || '#89b4fa'
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     let glyphs: Glyph[] = []
@@ -48,7 +51,9 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
     let chh = 0
     let raf = 0
     let last = 0
-    const pointer = { x: 0, y: 0, active: false }
+    let introduced = still
+    let builtWidth = 0
+    const pointer = { x: 0, y: 0, active: false, touch: false }
     const img = new Image()
 
     function build() {
@@ -130,6 +135,7 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
 
       const mouth = findMouth(cells.map((k) => (k.cover >= 0.6 ? k.rgb : null)), COLS, rows)
 
+      const prev = glyphs
       glyphs = []
       cells.forEach(({ cover, light, line, rgb }, i) => {
         if (cover < 0.3 && line < 0.5) return
@@ -145,51 +151,76 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
           hy: (r + 0.5) * chh,
           ox: 0,
           oy: 0,
-          vx: 0,
-          vy: 0,
+          density: DENSITY[0] + Math.random() * (DENSITY[1] - DENSITY[0]),
         })
       })
+
+      // A rebuild (fonts landing, a resize) keeps glyphs mid-flight rather
+      // than snapping them home; the glyph set only depends on the picture.
+      if (prev.length === glyphs.length) {
+        const scale = width / builtWidth
+        glyphs.forEach((g, i) => {
+          g.ox = prev[i].ox * scale
+          g.oy = prev[i].oy * scale
+          g.density = prev[i].density
+        })
+      } else if (!introduced) {
+        // fling each glyph out from the centre, past its home, with a twist
+        introduced = true
+        const cx = width / 2
+        const cy = (rows * chh) / 2
+        for (const g of glyphs) {
+          const angle = Math.atan2(g.hy - cy, g.hx - cx) + Math.random() * 2
+          const dist = Math.hypot(g.hx - cx, g.hy - cy) + (SCATTER[0] + Math.random() * (SCATTER[1] - SCATTER[0])) * width
+          g.ox = cx + Math.cos(angle) * dist - g.hx
+          g.oy = cy + Math.sin(angle) * dist - g.hy
+        }
+      }
+      builtWidth = width
       draw()
+      if (glyphs.some((g) => g.ox || g.oy)) wake()
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       for (const g of glyphs) {
-        const moved = Math.min(1, Math.hypot(g.ox, g.oy) / 10)
-        ctx.globalAlpha = Math.max(g.alpha, moved)
-        ctx.fillStyle = moved > 0.15 ? accent : g.color
+        // displaced glyphs brighten a little so the swirl reads
+        ctx.globalAlpha = g.ox || g.oy ? Math.min(1, g.alpha + 0.25) : g.alpha
+        ctx.fillStyle = g.color
         ctx.fillText(g.ch, g.hx + g.ox, g.hy + g.oy)
       }
       ctx.globalAlpha = 1
     }
 
     // Returns true while anything is still moving.
+    // Tuned per 60fps frame; `k` scales it to the real frame time.
     function step(dt: number) {
+      const k = dt * 60
+      const radius = (pointer.touch ? RADIUS_TOUCH : RADIUS) * cw
       let moving = false
       for (const g of glyphs) {
-        let ax = -SPRING * g.ox - DAMP * g.vx
-        let ay = -SPRING * g.oy - DAMP * g.vy
-        if (pointer.active) {
-          const dx = g.hx + g.ox - pointer.x
-          const dy = g.hy + g.oy - pointer.y
-          const d = Math.hypot(dx, dy)
-          if (d < RADIUS && d > 0.01) {
-            const f = PUSH * (1 - d / RADIUS) ** 2
-            ax += (dx / d) * f
-            ay += (dy / d) * f
-          }
+        const dx = pointer.x - (g.hx + g.ox)
+        const dy = pointer.y - (g.hy + g.oy)
+        const d = Math.hypot(dx, dy)
+        if (pointer.active && d < radius && d > 0.01) {
+          // away from the cursor, plus a turn to the side
+          const nx = dx / d
+          const ny = dy / d
+          const f = ((radius - d) / radius) * g.density * PUSH * cw * k
+          g.ox -= (nx + ny * SWIRL) * f
+          g.oy -= (ny - nx * SWIRL) * f
+        } else {
+          const ease = 1 - (1 - 1 / (g.density * 0.85)) ** k
+          g.ox = Math.abs(g.ox) < 0.5 ? 0 : g.ox * (1 - ease)
+          g.oy = Math.abs(g.oy) < 0.5 ? 0 : g.oy * (1 - ease)
         }
-        g.vx += ax * dt
-        g.vy += ay * dt
-        g.ox += g.vx * dt
-        g.oy += g.vy * dt
-        if (Math.abs(g.ox) + Math.abs(g.oy) + Math.abs(g.vx) + Math.abs(g.vy) > 0.05) moving = true
+        if (g.ox || g.oy) moving = true
       }
       return moving || pointer.active
     }
 
     function frame(now: number) {
-      const dt = Math.min(1 / 30, (now - last) / 1000)
+      const dt = Math.min(1 / 30, Math.max(0, now - last) / 1000)
       last = now
       const moving = step(dt)
       draw()
@@ -210,16 +241,18 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
     const onMove = (e: PointerEvent) => {
       locate(e)
       pointer.active = true
+      pointer.touch = e.pointerType !== 'mouse'
       wake()
     }
     const onLeave = () => {
       pointer.active = false
     }
-    // Taps on touch screens: a short burst instead of hover.
+    // Touch drags over the portrait swirl it rather than scroll the page.
     const onDown = (e: PointerEvent) => {
-      if (e.pointerType === 'mouse') return
-      onMove(e)
-      setTimeout(onLeave, 180)
+      if (e.pointerType !== 'mouse') onMove(e)
+    }
+    const onUp = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') onLeave()
     }
 
     img.onload = build
@@ -231,6 +264,8 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
     canvas.addEventListener('pointermove', onMove)
     canvas.addEventListener('pointerleave', onLeave)
     canvas.addEventListener('pointerdown', onDown)
+    canvas.addEventListener('pointerup', onUp)
+    canvas.addEventListener('pointercancel', onLeave)
 
     return () => {
       cancelAnimationFrame(raf)
@@ -238,11 +273,13 @@ export default function AsciiPortrait({ src, alt, fallback }: { src: string; alt
       canvas.removeEventListener('pointermove', onMove)
       canvas.removeEventListener('pointerleave', onLeave)
       canvas.removeEventListener('pointerdown', onDown)
+      canvas.removeEventListener('pointerup', onUp)
+      canvas.removeEventListener('pointercancel', onLeave)
     }
   }, [src])
 
   if (failed) return <>{fallback}</>
-  return <canvas ref={canvasRef} role="img" aria-label={alt} className="block w-full touch-pan-y" />
+  return <canvas ref={canvasRef} role="img" aria-label={alt} className="block w-full touch-none" />
 }
 
 // Marks the plain backdrop of an opaque photo so it renders blank instead of
