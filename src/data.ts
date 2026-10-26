@@ -356,19 +356,19 @@ static func get_cells_in_range(start_cell: Vector2i, range_value: int) -> Array[
     file: 'touchline',
     tagline: 'A Fantasy Premier League decision assistant that shows its working.',
     description:
-      "Touchline answers one question each week: what should I do with my team? It projects every player's expected points from underlying stats, minutes, and fixtures, then weighs transfers, captaincy, lineups, and chips against those numbers. Each week opens on a checklist of the calls to make before the deadline, and every recommendation breaks down into the parts behind it, so you can see why it's suggested and how confident it is. I use it regularly as my own app on my phone; the public demo gives you a random squad to play with on a weekly copy of real data.",
+      "Touchline answers one question each week: what should I do with my team? It projects every player's expected points from underlying stats, minutes, and fixtures, then weighs transfers, captaincy, lineups, and chips against those numbers. Home opens on the week's transfer call, with captaincy, lineup, and chips under it, and every recommendation breaks down into the parts behind it, so you can see why it's suggested and how confident it is. I use it regularly as my own app on my phone; the public demo gives you a random squad to play with on a weekly copy of real data.",
     year: '2026',
     tags: ['web', 'ml'],
     stack: ['Next.js 16', 'React 19', 'TypeScript', 'SQLite', 'Drizzle', 'Claude API', 'Tailwind', 'shadcn/ui', 'Recharts', 'Docker', 'Railway'],
     featured: true,
     // Screenshots and the video are from the touchline repo's media/ folder. The
-    // video is cut from its desktop recordings (week → see why in try → try
+    // video is cut from its desktop recordings (home → see why in try → try
     // swaps → rankings and compare → suggested plan → squad builder → news),
     // played at 1.25–2×; the poster and try image are frames from it.
     image: {
       src: '/images/touchline/home.png',
-      alt: 'Touchline’s Week page: the checklist before the deadline, a suggested pair of transfers worth +12.1 expected points after a −4 hit, and the squad on a pitch.',
-      caption: 'Week: the calls to make before the deadline, starting with the suggested transfer and why.',
+      alt: 'Touchline’s Home page: this week’s move, a pair of transfers worth +14.6 expected points after a −4 hit, with the captain, lineup, chips, and flagged players beside it.',
+      caption: 'Home: this week’s move and why, with the captain, lineup, and chips beside it.',
     },
     video: '/videos/touchline-tour.mp4',
     gallery: [
@@ -379,7 +379,7 @@ static func get_cells_in_range(start_cell: Vector2i, range_value: int) -> Array[
       },
       {
         src: '/images/touchline/try.png',
-        alt: 'The Try sandbox with two swaps made on the pitch, scored together: +12.1 expected points over five gameweeks after a −4 hit, with the gain per gameweek.',
+        alt: 'The Try sandbox with two swaps made on the pitch, scored together: +14.6 expected points over five gameweeks after a −4 hit, with the gain per gameweek.',
         caption: 'Try: swap players on your pitch and the model scores the whole set.',
       },
       {
@@ -394,7 +394,7 @@ static func get_cells_in_range(start_cell: Vector2i, range_value: int) -> Array[
       },
     ],
     highlights: [
-      'A transparent projection model, written from scratch: team strength from expected goals weighted toward recent form, start and minutes probabilities from match history, per-90 rates pulled toward position averages so small samples don’t swing wildly, penalties projected separately for each club’s first-choice taker, and lineups valued under FPL’s autosub rules.',
+      'A transparent projection model, written from scratch: team strength from expected goals weighted toward recent form, start and minutes probabilities from match history, per-90 rates pulled toward position averages so small samples don’t swing wildly, penalties projected separately for each club’s first-choice taker, lineups valued under FPL’s autosub rules, and an optional blend of bookmakers’ odds into each fixture’s expected goals.',
       'Every expected-points figure splits into components you can inspect.',
       'Decision tools on one engine: a transfer advisor weighing one, two, or (with free transfers banked) three to five moves against saving the transfer; a sandbox that scores any set of swaps you make on your pitch; replacement finders and side-by-side comparisons; a multi-week planner that can suggest a whole plan; a Wildcard/Free Hit squad builder; chip timing; and a league view of captaincy risk and differentials.',
       'A live mode while a gameweek is being played: scores, your points with provisional bonus and projected autosubs, an estimated average, and mini-league standings re-ranked on live scores.',
@@ -408,7 +408,7 @@ static func get_cells_in_range(start_cell: Vector2i, range_value: int) -> Array[
     sections: [
       {
         heading: 'one engine, every decision',
-        code: `match history · xG · fixtures · news
+        code: `match history · xG · fixtures · odds · news
       │
       ▼
 projection model ─────── expected points, split into components
