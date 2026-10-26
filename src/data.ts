@@ -367,7 +367,7 @@ static func get_cells_in_range(start_cell: Vector2i, range_value: int) -> Array[
     // played at 1.25–2×; the poster and try image are frames from it.
     image: {
       src: '/images/touchline/home.png',
-      alt: 'Touchline’s Home page: this week’s move, a pair of transfers worth +14.6 expected points after a −4 hit, with the captain, lineup, chips, and flagged players beside it.',
+      alt: 'Touchline’s Home page: this week’s move, a pair of transfers worth +14.0 expected points after a −4 hit, with the captain, lineup, chips, and flagged players beside it.',
       caption: 'Home: this week’s move and why, with the captain, lineup, and chips beside it.',
     },
     video: '/videos/touchline-tour.mp4',
@@ -379,7 +379,7 @@ static func get_cells_in_range(start_cell: Vector2i, range_value: int) -> Array[
       },
       {
         src: '/images/touchline/try.png',
-        alt: 'The Try sandbox with two swaps made on the pitch, scored together: +14.6 expected points over five gameweeks after a −4 hit, with the gain per gameweek.',
+        alt: 'The Try sandbox with two swaps made on the pitch, scored together: +14.0 expected points over five gameweeks after a −4 hit, with the gain per gameweek.',
         caption: 'Try: swap players on your pitch and the model scores the whole set.',
       },
       {
