@@ -29,8 +29,8 @@ export const profile = {
   sourceRepo: 'https://github.com/anontriton/portfolio',
 }
 
-// Time since my first CS class, as neofetch-style "3 years, 5 months, 2 days, 04:12:07".
-// The hero re-renders it every second, so it never needs updating by hand.
+// Time since my first CS class, as neofetch-style "3 years, 5 months, 2 days".
+// The hero re-reads it every second, so it rolls over at 1pm PT on its own.
 const firstClass = new Date('2023-05-26T13:00:00-07:00') // 1pm PDT
 function uptime(now = new Date()) {
   const addMonths = (n: number) => {
@@ -40,12 +40,10 @@ function uptime(now = new Date()) {
   }
   let months = (now.getUTCFullYear() - firstClass.getUTCFullYear()) * 12 + now.getUTCMonth() - firstClass.getUTCMonth()
   if (addMonths(months) > now) months--
-  const secs = Math.max(0, Math.floor((now.getTime() - addMonths(months).getTime()) / 1000))
-  const days = Math.floor(secs / 86400)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  const clock = [Math.floor(secs / 3600) % 24, Math.floor(secs / 60) % 60, secs % 60].map(pad).join(':')
-  const plural = (n: number, unit: string) => (n ? `${n} ${unit}${n === 1 ? '' : 's'}` : '')
-  return [plural(Math.floor(months / 12), 'year'), plural(months % 12, 'month'), plural(days, 'day'), clock].filter(Boolean).join(', ')
+  const days = Math.max(0, Math.floor((now.getTime() - addMonths(months).getTime()) / 86_400_000))
+  // A non-breaking space keeps each number on the same line as its unit.
+  const plural = (n: number, unit: string) => (n ? `${n}\u00a0${unit}${n === 1 ? '' : 's'}` : '')
+  return [plural(Math.floor(months / 12), 'year'), plural(months % 12, 'month'), plural(days, 'day')].filter(Boolean).join(', ') || 'just booted'
 }
 
 // The hero's neofetch readout, top to bottom. `accent` colours the value; a
@@ -56,12 +54,11 @@ export const neofetch: { key: string; value: string | (() => string); accent?: s
   { key: 'role', value: profile.title.toLowerCase() },
   { key: 'focus', value: profile.focus.toLowerCase() },
   { key: 'kernel', value: 'coffee', accent: 'text-orange' },
-  { key: 'uptime', value: uptime },
   { key: 'editor', value: 'neovim, zed' },
   { key: 'education', value: profile.degreeShort },
   { key: 'background', value: 'biology, environmental science' },
   { key: 'interests', value: 'ai/ml, biotech, game dev, open source' },
-  { key: 'location', value: profile.location },
+  { key: 'uptime', value: uptime },
   { key: 'status', value: profile.status, accent: 'text-green' },
 ]
 

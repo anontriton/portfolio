@@ -18,7 +18,7 @@ npm run preview   # serve dist/ locally
 Everything on the site except blog posts comes from [`src/data.ts`](src/data.ts):
 
 - `profile` — name, links, email, bio (`pitch`), status line,  "currently building" entry
-- `neofetch` — the hero readout, top to bottom; lines that repeat profile facts read them from `profile`, and `uptime` ticks up every second from my first CS class (May 26, 2023, 1pm PT)
+- `neofetch` — the hero readout, top to bottom; lines that repeat profile facts read them from `profile`, and `uptime` counts up live, to the day, from my first CS class (May 26, 2023, 1pm PT)
 - `projects` — cards and case-study pages (`/projects/:slug`); `featured` controls the tl;dr
 - `experience` — `kind: 'other'` roles sit in a collapsed "more roles" group
 - `education`, `skills`, `about` (the about.md section)
