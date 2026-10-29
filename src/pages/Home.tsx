@@ -30,6 +30,16 @@ const LOGO = String.raw`██╗██╗
 ██║███████╗
 ╚═╝╚══════╝`
 
+// A neofetch value that re-reads itself every second, like the uptime.
+function Live({ read }: { read: () => string }) {
+  const [value, setValue] = useState(read)
+  useEffect(() => {
+    const id = setInterval(() => setValue(read()), 1000)
+    return () => clearInterval(id)
+  }, [read])
+  return <span className="tabular-nums">{value}</span>
+}
+
 export default function Home() {
   // Unfeatured projects are only listed on /projects.
   const others = projects.slice(1).filter((p) => p.featured)
@@ -127,7 +137,7 @@ function Hero() {
             {neofetch.map((f) => (
               <div key={f.key} className="contents">
                 <dt className="text-blue">{f.key}</dt>
-                <dd className={f.accent ?? 'text-fg-dim'}>{f.value}</dd>
+                <dd className={f.accent ?? 'text-fg-dim'}>{typeof f.value === 'string' ? f.value : <Live read={f.value} />}</dd>
               </div>
             ))}
           </dl>
