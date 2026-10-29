@@ -29,24 +29,34 @@ export const profile = {
   sourceRepo: 'https://github.com/anontriton/portfolio',
 }
 
-// Months since a YYYY-MM start, as neofetch-style "3 years, 4 months".
-// Computed when the page loads, so it never needs updating by hand.
-function uptime(start: string) {
-  const [y, m] = start.split('-').map(Number)
-  const now = new Date()
-  const months = (now.getFullYear() - y) * 12 + now.getMonth() + 1 - m
+// Time since my first CS class, as neofetch-style "3 years, 5 months, 2 days, 04:12:07".
+// The hero re-renders it every second, so it never needs updating by hand.
+const firstClass = new Date('2023-05-26T13:00:00-07:00') // 1pm PDT
+function uptime(now = new Date()) {
+  const addMonths = (n: number) => {
+    const d = new Date(firstClass)
+    d.setUTCMonth(d.getUTCMonth() + n)
+    return d
+  }
+  let months = (now.getUTCFullYear() - firstClass.getUTCFullYear()) * 12 + now.getUTCMonth() - firstClass.getUTCMonth()
+  if (addMonths(months) > now) months--
+  const secs = Math.max(0, Math.floor((now.getTime() - addMonths(months).getTime()) / 1000))
+  const days = Math.floor(secs / 86400)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const clock = [Math.floor(secs / 3600) % 24, Math.floor(secs / 60) % 60, secs % 60].map(pad).join(':')
   const plural = (n: number, unit: string) => (n ? `${n} ${unit}${n === 1 ? '' : 's'}` : '')
-  return [plural(Math.floor(months / 12), 'year'), plural(months % 12, 'month')].filter(Boolean).join(', ') || 'just booted'
+  return [plural(Math.floor(months / 12), 'year'), plural(months % 12, 'month'), plural(days, 'day'), clock].filter(Boolean).join(', ')
 }
 
-// The hero's neofetch readout, top to bottom. `accent` colours the value.
+// The hero's neofetch readout, top to bottom. `accent` colours the value; a
+// function value is live and re-read every second.
 // Lines that repeat profile facts read them from `profile`, so each value is
 // edited in one place.
-export const neofetch: { key: string; value: string; accent?: string }[] = [
+export const neofetch: { key: string; value: string | (() => string); accent?: string }[] = [
   { key: 'role', value: profile.title.toLowerCase() },
   { key: 'focus', value: profile.focus.toLowerCase() },
   { key: 'kernel', value: 'coffee', accent: 'text-orange' },
-  { key: 'uptime', value: uptime('2023-06') }, // started CS in June 2023
+  { key: 'uptime', value: uptime },
   { key: 'editor', value: 'neovim, zed' },
   { key: 'education', value: profile.degreeShort },
   { key: 'background', value: 'biology, environmental science' },
