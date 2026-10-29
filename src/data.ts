@@ -58,7 +58,6 @@ export const neofetch: { key: string; value: string | (() => string); accent?: s
   { key: 'education', value: profile.degreeShort },
   { key: 'background', value: 'biology, environmental science' },
   { key: 'interests', value: 'ai/ml, biotech, game dev, open source' },
-  { key: 'location', value: profile.location },
   { key: 'uptime', value: uptime },
   { key: 'status', value: profile.status, accent: 'text-green' },
 ]
