@@ -30,7 +30,7 @@ export const profile = {
 }
 
 // Time since my first CS class, as neofetch-style
-// "3 years, 5 months, 2 days, 4 hours, 12 mins".
+// "3 years, 5 months, 2 days, 4 hrs, 12 mins".
 // The hero re-reads it every second, so it never needs updating by hand.
 const firstClass = new Date('2023-05-26T13:00:00-07:00') // 1pm PDT
 function uptime(now = new Date()) {
@@ -44,10 +44,10 @@ function uptime(now = new Date()) {
   const secs = Math.max(0, Math.floor((now.getTime() - addMonths(months).getTime()) / 1000))
   // A non-breaking space keeps each number on the same line as its unit.
   const plural = (n: number, unit: string) => `${n}\u00a0${unit}${n === 1 ? '' : 's'}`
-  // Zero years, months and days are dropped; hours and mins always show, so
+  // Zero years, months and days are dropped; hrs and mins always show, so
   // the line doesn't jump in length every time the mins roll over.
   const date = [plural(Math.floor(months / 12), 'year'), plural(months % 12, 'month'), plural(Math.floor(secs / 86400), 'day')]
-  const clock = [plural(Math.floor(secs / 3600) % 24, 'hour'), plural(Math.floor(secs / 60) % 60, 'min')]
+  const clock = [plural(Math.floor(secs / 3600) % 24, 'hr'), plural(Math.floor(secs / 60) % 60, 'min')]
   return [...date.filter((u) => !u.startsWith('0\u00a0')), ...clock].join(', ')
 }
 
