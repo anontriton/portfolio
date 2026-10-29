@@ -29,7 +29,8 @@ export const profile = {
   sourceRepo: 'https://github.com/anontriton/portfolio',
 }
 
-// Time since my first CS class, as neofetch-style "3 years, 5 months, 2 days, 04:12:07".
+// Time since my first CS class, as neofetch-style
+// "3 years, 5 months, 2 days, 4 hours, 12 minutes, 7 seconds".
 // The hero re-renders it every second, so it never needs updating by hand.
 const firstClass = new Date('2023-05-26T13:00:00-07:00') // 1pm PDT
 function uptime(now = new Date()) {
@@ -41,11 +42,13 @@ function uptime(now = new Date()) {
   let months = (now.getUTCFullYear() - firstClass.getUTCFullYear()) * 12 + now.getUTCMonth() - firstClass.getUTCMonth()
   if (addMonths(months) > now) months--
   const secs = Math.max(0, Math.floor((now.getTime() - addMonths(months).getTime()) / 1000))
-  const days = Math.floor(secs / 86400)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  const clock = [Math.floor(secs / 3600) % 24, Math.floor(secs / 60) % 60, secs % 60].map(pad).join(':')
-  const plural = (n: number, unit: string) => (n ? `${n} ${unit}${n === 1 ? '' : 's'}` : '')
-  return [plural(Math.floor(months / 12), 'year'), plural(months % 12, 'month'), plural(days, 'day'), clock].filter(Boolean).join(', ')
+  // A non-breaking space keeps each number on the same line as its unit.
+  const plural = (n: number, unit: string) => `${n}\u00a0${unit}${n === 1 ? '' : 's'}`
+  // Zero years, months and days are dropped; the clock units always show, so
+  // the line doesn't jump in length every time the seconds roll over.
+  const date = [plural(Math.floor(months / 12), 'year'), plural(months % 12, 'month'), plural(Math.floor(secs / 86400), 'day')]
+  const clock = [plural(Math.floor(secs / 3600) % 24, 'hour'), plural(Math.floor(secs / 60) % 60, 'minute'), plural(secs % 60, 'second')]
+  return [...date.filter((u) => !u.startsWith('0\u00a0')), ...clock].join(', ')
 }
 
 // The hero's neofetch readout, top to bottom. `accent` colours the value; a
