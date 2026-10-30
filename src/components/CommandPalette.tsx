@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { posts } from '../blog'
-import { profile, projects } from '../data'
+import { email, profile, projects } from '../data'
 import { useGlide } from './motion'
 import { useToast } from './Toasts'
 
@@ -56,7 +56,7 @@ export default function CommandPalette({ onClose, onTldr }: { onClose: () => voi
         run: go(`/blog/${p.slug}`),
       })),
       { id: 'resume', group: 'run', label: 'open resume', hint: 'resume.pdf ↗', keywords: 'cv', run: open(profile.resume) },
-      { id: 'email', group: 'run', label: 'copy email', hint: profile.email, keywords: 'contact mail', run: copy(profile.email, 'email') },
+      { id: 'email', group: 'run', label: 'copy email', hint: profile.emailShown, keywords: 'contact mail', run: () => copy(email(), 'email')() },
       { id: 'contact', group: 'run', label: 'send a message', hint: './contact.sh', keywords: 'contact email mail', run: go('/#contact') },
       { id: 'tldr', group: 'run', label: 'tl;dr', hint: 'recruiter summary', keywords: 'summary tldr', run: onTldr },
       { id: 'link', group: 'run', label: 'copy link to this page', hint: 'url', keywords: 'share', run: copy(location.href, 'link') },

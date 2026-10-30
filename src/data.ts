@@ -15,7 +15,11 @@ export const profile = {
   degree: 'm.s. computer science, tufts university, 2026',
   degreeShort: 'm.s. computer science, tufts 2026', // fits beside the portrait
   status: 'open to swe roles',
-  email: 'hello@iversonlai.dev',
+  // Shown as text instead of the address. The real address is only put
+  // together when someone clicks email or copies it (see `email()` below), so
+  // it never appears whole in the page or the JS bundle for scrapers to find.
+  emailShown: 'hello[at]iversonlai[dot]dev',
+  emailParts: ['hello', 'iversonlai', 'dev'],
   github: 'https://github.com/anontriton',
   linkedin: 'https://www.linkedin.com/in/iversonlai',
   monkeytype: 'https://monkeytype.com/profile/iversonlai0',
@@ -27,6 +31,17 @@ export const profile = {
   // Shown under "building" in the hero and tl;dr. Set to null to hide.
   current: null as null | { name: string; note: string; href?: string },
   sourceRepo: 'https://github.com/anontriton/portfolio',
+}
+
+export function email() {
+  const [user, domain, tld] = profile.emailParts
+  return [user, [domain, tld].join('.')].join('@')
+}
+
+// Opens the visitor's mail app, optionally with a subject and body filled in.
+export function openMail(fields?: Record<string, string>) {
+  const query = fields ? `?${new URLSearchParams(fields).toString().replace(/\+/g, '%20')}` : ''
+  location.href = `mailto:${email()}${query}`
 }
 
 // Time since my first CS class, as neofetch-style "3 years, 5 months, 2 days".
