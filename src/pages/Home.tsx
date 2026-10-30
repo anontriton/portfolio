@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { about, contributions, education, experience, neofetch, profile, projects, skills, type Job } from '../data'
+import { about, contributions, education, experience, neofetch, openMail, profile, projects, skills, type Job } from '../data'
 import { useTldr } from '../components/Layout'
 import ProjectCard from '../components/ProjectCard'
 import ActivityGraph from '../components/ActivityGraph'
@@ -170,9 +170,9 @@ function Hero() {
           <Button href={profile.resume} primary icon={<IconFile />}>
             resume
           </Button>
-          <Button href={`mailto:${profile.email}`} icon={<IconMail />}>
+          <ActionButton onClick={() => openMail()} icon={<IconMail />}>
             email
-          </Button>
+          </ActionButton>
           <ActionButton onClick={openTldr}>tl;dr</ActionButton>
         </div>
         <span className="mx-1.5 hidden h-6 w-px bg-line sm:block" />
@@ -460,10 +460,6 @@ function Contact() {
   const openedAt = useRef(Date.now())
   const toast = useToast()
 
-  const mailto = `mailto:${profile.email}?${new URLSearchParams({ subject: subject || 'Hello from your portfolio', body })
-    .toString()
-    .replace(/\+/g, '%20')}`
-
   async function send(e: FormEvent) {
     e.preventDefault()
     setStatus({ state: 'sending' })
@@ -492,7 +488,7 @@ function Contact() {
       <form onSubmit={send} className="rounded-[4px] border border-line bg-surface text-[13px]">
         <div className={row}>
           <span className="w-[64px] shrink-0 text-amber">to:</span>
-          <span className="truncate text-fg">{profile.email}</span>
+          <span className="truncate text-fg">{profile.emailShown}</span>
         </div>
         <label className={row}>
           <span className="w-[64px] shrink-0 text-amber">from:</span>
@@ -522,9 +518,13 @@ function Contact() {
             {status.state === 'error' && (
               <span className="text-red">
                 {status.message} ·{' '}
-                <a href={mailto} className="underline hover:text-fg">
+                <button
+                  type="button"
+                  onClick={() => openMail({ subject: subject || 'Hello from your portfolio', body })}
+                  className="cursor-pointer underline hover:text-fg"
+                >
                   use your mail app
-                </a>
+                </button>
               </span>
             )}
             {status.state === 'sending' && 'sending…'}

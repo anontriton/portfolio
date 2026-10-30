@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { profile, projects } from '../data'
+import { openMail, profile, projects } from '../data'
 import { IconFile, IconGithub, IconLinkedin, IconMail } from './ui'
 import CommandPalette, { modKey } from './CommandPalette'
 import SharkBackground from './SharkBackground'
@@ -233,9 +233,9 @@ function Tldr({ onClose }: { onClose: () => void }) {
           <a href={profile.resume} target="_blank" rel="noreferrer" className="tl-btn text-blue">
             <IconFile /> resume
           </a>
-          <a href={`mailto:${profile.email}`} className="tl-btn">
+          <button type="button" onClick={() => openMail()} className="tl-btn cursor-pointer">
             <IconMail /> email
-          </a>
+          </button>
           <a href={profile.linkedin} target="_blank" rel="noreferrer" className="tl-btn">
             <IconLinkedin /> linkedin
           </a>

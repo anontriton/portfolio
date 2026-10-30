@@ -1,3 +1,4 @@
 {
-  "rewrites": [{ "source": "/((?!api/|_vercel/)(?!.*\\.).*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!api/|_vercel/)(?!.*\\.).*)", "destination": "/index.html" }],
+  "headers": [{ "source": "/resume.pdf", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }]
 }
